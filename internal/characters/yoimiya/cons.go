@@ -60,7 +60,7 @@ func (c *char) c2() {
 // 				25,
 // 				aimExtra[c.TalentLvlAttack()],
 // 			)
-// 			c.QueueDmg(&d, 20)
+// 			c.QueueDmg(d, 20)
 // 		}
 
 // 		return false

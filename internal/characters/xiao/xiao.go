@@ -137,3 +137,38 @@ func (c *char) ActionStam(a core.ActionType, p map[string]int) float64 {
 		return 0
 	}
 }
+
+// Xiao specific Snapshot implementation for his burst bonuses. Similar to Hu Tao
+// Implements burst anemo attack damage conversion and DMG bonus
+// Also implements A1:
+// While under the effects of Bane of All Evil, all DMG dealt by Xiao is increased by 5%. DMG is increased by an additional 5% for every 3s the ability persists. The maximum DMG Bonus is 25%
+func (c *char) Snapshot(name string, a core.AttackTag, icd core.ICDTag, g core.ICDGroup, st core.StrikeType, e core.EleType, d core.Durability, mult float64) *core.Snapshot {
+	ds := c.Tmpl.Snapshot(name, a, icd, g, st, e, d, mult)
+
+	if c.Core.Status.Duration("xiaoburst") > 0 {
+		// Calculate and add A1 damage bonus - applies to all damage
+		// Fraction dropped in int conversion in go - acts like floor
+		stacks := 1 + int((c.Core.F-c.qStarted)/180)
+		if stacks > 5 {
+			stacks = 5
+		}
+		ds.Stats[core.DmgP] += float64(stacks) * 0.05
+		c.Core.Log.Debugw("a1 adding dmg %", "frame", c.Core.F, "event", core.LogCharacterEvent, "char", c.Index, "stacks", stacks, "final", ds.Stats[core.DmgP], "time since burst start", c.Core.F-c.qStarted)
+
+		// Anemo conversion and dmg bonus application to normal, charged, and plunge attacks
+		// Also handle burst CA ICD change to share with Normal
+		switch ds.AttackTag {
+		case core.AttackTagNormal:
+		case core.AttackTagExtra:
+			ds.ICDTag = core.ICDTagNormalAttack
+		case core.AttackTagPlunge:
+		default:
+			return ds
+		}
+		ds.Element = core.Anemo
+		bonus := burstBonus[c.TalentLvlBurst()]
+		ds.Stats[core.DmgP] += bonus
+		c.Core.Log.Debugw("xiao burst damage bonus", "frame", c.Core.F, "event", core.LogCharacterEvent, "char", c.Index, "bonus", bonus, "final", ds.Stats[core.DmgP])
+	}
+	return ds
+}

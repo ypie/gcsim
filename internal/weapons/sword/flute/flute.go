@@ -56,7 +56,7 @@ func weapon(char core.Character, c *core.Core, r int, param map[string]int) {
 				0.75+0.25*float64(r),
 			)
 			d.Targets = core.TargetAll
-			char.QueueDmg(&d, 1)
+			char.QueueDmg(d, 1)
 
 		}
 		return false

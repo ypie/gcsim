@@ -148,11 +148,14 @@ func (c *char) Attack(p map[string]int) (int, int) {
 	d.Targets = core.TargetAll
 
 	for i, mult := range auto[c.NormalCounter] {
-		x := d.Clone()
+		x := c.Core.Snapshots.Clone(d)
 		x.Mult = mult[c.TalentLvlAttack()]
 		x.Targets = core.TargetAll
-		c.QueueDmg(&x, delay[c.NormalCounter][i])
+		c.QueueDmg(x, delay[c.NormalCounter][i])
 	}
+
+	c.Core.Snapshots.Release(d)
+	d = nil
 
 	c.AdvanceNormalIndex()
 
@@ -186,7 +189,7 @@ func (c *char) pressE() {
 	)
 	d.Targets = core.TargetAll
 
-	c.QueueDmg(&d, 35)
+	c.QueueDmg(d, 35)
 
 	n := 1
 	if c.Core.Rand.Float64() < .5 {
@@ -222,12 +225,12 @@ func (c *char) holdE() {
 		skillHold[lvl],
 	)
 	d.Targets = core.TargetAll
-	c.QueueDmg(&d, 80)
+	c.QueueDmg(d, 80)
 
 	//multiple brand hits
 	v := c.Tags["grimheart"]
 
-	d = c.Snapshot(
+	d1 := c.Snapshot(
 		"Icetide Vortex (Icewhirl)",
 		core.AttackTagElementalArt,
 		core.ICDTagNone,
@@ -237,16 +240,11 @@ func (c *char) holdE() {
 		25,
 		icewhirl[lvl],
 	)
-	d.Targets = core.TargetAll
-
-	for i := 0; i < v; i++ {
-		x := d.Clone()
-		c.QueueDmg(&x, 90+i*7) //we're basically forcing it so we get 3 stacks
-	}
+	d1.Targets = core.TargetAll
 
 	//shred
 	if v > 0 {
-		d.OnHitCallback = func(t core.Target) {
+		d1.OnHitCallback = func(t core.Target) {
 			t.AddResMod("Icewhirl Cryo", core.ResistMod{
 				Ele:      core.Cryo,
 				Value:    -resRed[lvl],
@@ -261,6 +259,14 @@ func (c *char) holdE() {
 		}
 	}
 
+	for i := 0; i < v; i++ {
+		x := c.Core.Snapshots.Clone(d1)
+		c.QueueDmg(x, 90+i*7) //we're basically forcing it so we get 3 stacks
+	}
+
+	c.Core.Snapshots.Release(d1)
+	d1 = nil
+
 	//A2
 	if v == 2 {
 		d := c.Snapshot(
@@ -274,7 +280,7 @@ func (c *char) holdE() {
 			burstExplodeBase[c.TalentLvlBurst()]*0.5,
 		)
 		d.Targets = core.TargetAll
-		c.QueueDmg(&d, 108) //we're basically forcing it so we get 3 stacks
+		c.QueueDmg(d, 108) //we're basically forcing it so we get 3 stacks
 	}
 
 	n := 2
@@ -328,7 +334,7 @@ func (c *char) Burst(p map[string]int) (int, int) {
 	)
 	d.Targets = core.TargetAll
 
-	c.QueueDmg(&d, f-1)
+	c.QueueDmg(d, f-1)
 
 	//add 1 stack to Grimheart
 	v := c.Tags["grimheart"]
@@ -405,7 +411,7 @@ func (c *char) triggerBurst() {
 
 	c.Core.Log.Debugw("eula burst triggering", "frame", c.Core.F, "event", core.LogCharacterEvent, "stacks", stacks, "mult", d.Mult)
 
-	c.Core.Combat.ApplyDamage(&d)
+	c.Core.Combat.ApplyDamage(d)
 	c.Core.Status.DeleteStatus("eulaq")
 	c.burstCounter = 0
 }

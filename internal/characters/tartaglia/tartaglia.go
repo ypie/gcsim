@@ -91,7 +91,7 @@ func (c *char) onDefeatTargets() {
 			)
 			d.Targets = core.TargetAll
 
-			c.Core.Combat.ApplyDamage(&d)
+			c.Core.Combat.ApplyDamage(d)
 
 			c.Core.Log.Debugw("Riptide Burst ticked", "frame", c.Core.F, "event", core.LogCharacterEvent)
 		}, "Riptide Burst", 5)

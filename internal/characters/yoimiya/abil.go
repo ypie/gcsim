@@ -28,7 +28,7 @@ func (c *char) Attack(p map[string]int) (int, int) {
 			25,
 			mult[c.TalentLvlAttack()],
 		)
-		c.QueueDmg(&d, travel+f-5+i)
+		c.QueueDmg(d, travel+f-5+i)
 		totalMV += mult[c.TalentLvlAttack()]
 	}
 
@@ -47,7 +47,7 @@ func (c *char) Attack(p map[string]int) (int, int) {
 			25,
 			totalMV,
 		)
-		c.QueueDmg(&d, travel+f+5)
+		c.QueueDmg(d, travel+f+5)
 
 	}
 
@@ -109,7 +109,7 @@ func (c *char) Burst(p map[string]int) (int, int) {
 	)
 	d.Targets = core.TargetAll
 
-	c.QueueDmg(&d, f)
+	c.QueueDmg(d, f)
 
 	//marker an opponent after first hit
 	//ignore the bouncing around for now (just assume it's always target 0)
@@ -188,7 +188,7 @@ func (c *char) burstHook() {
 			burstExplode[c.TalentLvlBurst()],
 		)
 		d.Targets = core.TargetAll
-		c.QueueDmg(&d, 1)
+		c.QueueDmg(d, 1)
 		c.Core.Status.AddStatus("aurousicd", 120) //2 sec icd
 
 		//check for c4

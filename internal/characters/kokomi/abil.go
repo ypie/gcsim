@@ -28,7 +28,7 @@ func (c *char) Attack(p map[string]int) (int, int) {
 	)
 	d.FlatDmg = c.burstDmgBonus(d.AttackTag)
 	// TODO: Assume that this is not dynamic (snapshot on projectile release)
-	c.QueueDmg(&d, f+travel)
+	c.QueueDmg(d, f+travel)
 
 	if c.NormalCounter == c.NormalHitNum-1 {
 		c.c1(f)
@@ -62,7 +62,7 @@ func (c *char) c1(f int) {
 
 	// TODO: Frames not in library - Think it's 7 frames based on a rough count
 	// TODO: Is this snapshotted/dynamic?
-	c.QueueDmg(&d, f+7)
+	c.QueueDmg(d, f+7)
 }
 
 // Standard charge attack
@@ -85,7 +85,7 @@ func (c *char) ChargeAttack(p map[string]int) (int, int) {
 		d.Targets = core.TargetAll
 		d.FlatDmg = c.burstDmgBonus(d.AttackTag)
 
-		return &d
+		return d
 	}, f)
 
 	return f, a
@@ -127,14 +127,14 @@ func (c *char) createSkillSnapshot() *core.Snapshot {
 	)
 	d.Targets = core.TargetAll
 	d.FlatDmg = c.burstDmgBonus(d.AttackTag)
-	return &d
+	return d
 }
 
 // Helper function that handles damage, healing, and particle components of every tick of her E
 func (c *char) skillTick(d *core.Snapshot) {
 
-	x := d.Clone()
-	c.Core.Combat.ApplyDamage(&x)
+	x := c.Core.Snapshots.Clone(d)
+	c.Core.Combat.ApplyDamage(x)
 
 	c.Core.Health.HealActive(c.Index, skillHealPct[c.TalentLvlSkill()]*c.HPMax+skillHealFlat[c.TalentLvlSkill()])
 
@@ -200,7 +200,7 @@ func (c *char) Burst(p map[string]int) (int, int) {
 		)
 		d.Targets = core.TargetAll
 		d.FlatDmg = burstDmg[c.TalentLvlBurst()] * c.HPMax
-		return &d
+		return d
 	}, f)
 
 	c.Core.Status.AddStatus("kokomiburst", 10*60)

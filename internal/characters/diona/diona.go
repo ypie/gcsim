@@ -119,7 +119,7 @@ func (c *char) Attack(p map[string]int) (int, int) {
 		auto[c.NormalCounter][c.TalentLvlAttack()],
 	)
 
-	c.QueueDmg(&d, travel+f)
+	c.QueueDmg(d, travel+f)
 
 	c.AdvanceNormalIndex()
 
@@ -148,7 +148,7 @@ func (c *char) Aimed(p map[string]int) (int, int) {
 	d.HitWeakPoint = true
 	d.AnimationFrames = f
 
-	c.QueueDmg(&d, travel+f)
+	c.QueueDmg(d, travel+f)
 
 	return f, a
 }
@@ -191,16 +191,18 @@ func (c *char) Skill(p map[string]int) (int, int) {
 	count := 0
 
 	for i := 0; i < pawCount; i++ {
-		x := d.Clone()
+		x := c.Core.Snapshots.Clone(d)
 		if c.Base.Cons >= 2 {
 			d.Stats[core.DmgP] += 0.15
 		}
-		c.QueueDmg(&x, travel+f-5+i)
+		c.QueueDmg(x, travel+f-5+i)
 
 		if c.Core.Rand.Float64() < 0.8 {
 			count++
 		}
 	}
+	c.Core.Snapshots.Release(d)
+	d = nil
 
 	//particles
 	c.QueueParticle("Diona", count, core.Cryo, 90) //90s travel time
@@ -235,7 +237,7 @@ func (c *char) Burst(p map[string]int) (int, int) {
 		25,
 		burst[c.TalentLvlBurst()],
 	)
-	c.QueueDmg(&d, f-10)
+	c.QueueDmg(d, f-10)
 
 	d = c.Snapshot(
 		"Signature Mix (Tick)",
@@ -254,12 +256,15 @@ func (c *char) Burst(p map[string]int) (int, int) {
 	//ticks every 2s, first tick at t=1s, then t=3,5,7,9,11, lasts for 12.5
 	for i := 0; i < 6; i++ {
 		c.AddTask(func() {
-			x := d.Clone()
-			c.Core.Combat.ApplyDamage(&x)
+			x := c.Core.Snapshots.Clone(d)
+			c.Core.Combat.ApplyDamage(x)
 			c.Core.Log.Debugw("diona healing", "frame", c.Core.F, "event", core.LogCharacterEvent, "+heal", hpplus, "max hp", maxhp, "heal amount", heal)
 			c.Core.Health.HealActive(c.Index, heal)
 		}, "Diona Burst (DOT)", 60+i*120)
 	}
+
+	c.Core.Snapshots.Release(d)
+	d = nil
 
 	//apparently lasts for 12.5
 	c.Core.Status.AddStatus("dionaburst", f+750) //TODO not sure when field starts, is it at animation end? prob when it lands...

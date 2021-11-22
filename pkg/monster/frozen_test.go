@@ -47,7 +47,7 @@ func TestFrozenDuration(t *testing.T) {
 
 	fmt.Println("----testing applying 25 cryo on 50 hydro (no delay)----")
 
-	c.Combat.ApplyDamage(&core.Snapshot{
+	c.Combat.ApplyDamage(core.Snapshot{
 		Durability: 50,
 		Element:    core.Hydro,
 		ICDTag:     core.ICDTagNone,
@@ -56,7 +56,7 @@ func TestFrozenDuration(t *testing.T) {
 		Targets:    core.TargetAll,
 		DamageSrc:  -1,
 	})
-	c.Combat.ApplyDamage(&core.Snapshot{
+	c.Combat.ApplyDamage(core.Snapshot{
 		CharLvl:    90,
 		Durability: 25,
 		Element:    core.Cryo,

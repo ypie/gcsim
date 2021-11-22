@@ -89,7 +89,7 @@ func (c *char) Attack(p map[string]int) (int, int) {
 		auto[c.NormalCounter][c.TalentLvlAttack()],
 	)
 
-	c.QueueDmg(&d, f-1)
+	c.QueueDmg(d, f-1)
 
 	//check for healing
 	if c.Core.Rand.Float64() < 0.5 {
@@ -124,7 +124,7 @@ func (c *char) Skill(p map[string]int) (int, int) {
 		c.Core.Log.Debugw("jean c1 adding 40% dmg", "frame", c.Core.F, "event", core.LogCharacterEvent, "final dmg%", d.Stats[core.DmgP])
 	}
 
-	c.QueueDmg(&d, f-1)
+	c.QueueDmg(d, f-1)
 
 	count := 2
 	if c.Core.Rand.Float64() < .67 {
@@ -157,14 +157,14 @@ func (c *char) Burst(p map[string]int) (int, int) {
 	)
 	d.Targets = core.TargetAll
 
-	c.QueueDmg(&d, f-10) //TODO: initial damage frames
+	c.QueueDmg(d, f-10) //TODO: initial damage frames
 
 	for i := 0; i < enter; i++ {
-		x := d.Clone()
+		x := c.Core.Snapshots.Clone(d)
 		x.Abil = "Dandelion Breeze (In/Out)"
 		x.Mult = burstEnter[c.TalentLvlBurst()]
 
-		c.QueueDmg(&x, f+i*delay)
+		c.QueueDmg(x, f+i*delay)
 	}
 
 	c.Core.Status.AddStatus("jeanq", 630)

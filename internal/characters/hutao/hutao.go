@@ -165,9 +165,9 @@ func (c *char) Attack(p map[string]int) (int, int) {
 	)
 
 	for i := 0; i < hits; i++ {
-		x := d.Clone()
+		x := c.Core.Snapshots.Clone(d)
 		x.Mult = attack[c.NormalCounter][i][c.TalentLvlAttack()]
-		c.QueueDmg(&x, dmgFrame[c.NormalCounter][i])
+		c.QueueDmg(x, dmgFrame[c.NormalCounter][i])
 	}
 
 	c.AdvanceNormalIndex()
@@ -212,7 +212,7 @@ func (c *char) ChargeAttack(p map[string]int) (int, int) {
 		charge[c.TalentLvlAttack()],
 	)
 
-	c.QueueDmg(&d, f-5)
+	c.QueueDmg(d, f-5)
 
 	return f, a
 }
@@ -268,7 +268,7 @@ func (c *char) bbtickfunc(src int) func() {
 		if c.Base.Cons >= 2 {
 			d.FlatDmg += c.HPMax * 0.1
 		}
-		c.Core.Combat.ApplyDamage(&d)
+		c.Core.Combat.ApplyDamage(d)
 		c.Core.Log.Debugw("Blood Blossom ticked", "frame", c.Core.F, "event", core.LogCharacterEvent, "next expected tick", c.Core.F+240, "dur", c.Core.Status.Duration("htbb"), "src", src)
 		//only queue if next tick buff will be active still
 		// if c.Core.F+240 > c.CD["bb"] {
@@ -367,7 +367,7 @@ func (c *char) Burst(p map[string]int) (int, int) {
 			mult,
 		)
 		d.Targets = core.TargetAll
-		c.Core.Combat.ApplyDamage(&d)
+		c.Core.Combat.ApplyDamage(d)
 	}, "Hutao Burst", f-5) //random 5 frame
 
 	c.Energy = 0
@@ -375,7 +375,7 @@ func (c *char) Burst(p map[string]int) (int, int) {
 	return f, a
 }
 
-func (c *char) Snapshot(name string, a core.AttackTag, icd core.ICDTag, g core.ICDGroup, st core.StrikeType, e core.EleType, d core.Durability, mult float64) core.Snapshot {
+func (c *char) Snapshot(name string, a core.AttackTag, icd core.ICDTag, g core.ICDGroup, st core.StrikeType, e core.EleType, d core.Durability, mult float64) *core.Snapshot {
 	ds := c.Tmpl.Snapshot(name, a, icd, g, st, e, d, mult)
 
 	if c.Core.Status.Duration("paramita") > 0 {

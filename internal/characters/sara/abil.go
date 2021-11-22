@@ -27,7 +27,7 @@ func (c *char) Attack(p map[string]int) (int, int) {
 		25,
 		attack[c.NormalCounter][c.TalentLvlAttack()],
 	)
-	c.QueueDmg(&d, f+travel)
+	c.QueueDmg(d, f+travel)
 
 	c.AdvanceNormalIndex()
 
@@ -65,7 +65,7 @@ func (c *char) Aimed(p map[string]int) (int, int) {
 	d.HitWeakPoint = hitWeakPoint
 	d.AnimationFrames = f
 
-	c.QueueDmg(&d, travel+f)
+	c.QueueDmg(d, travel+f)
 
 	// Cover state handling - drops crowfeather, which explodes after 1.5 seconds
 	if c.Core.Status.Duration("saracover") > 0 {
@@ -82,7 +82,7 @@ func (c *char) Aimed(p map[string]int) (int, int) {
 		)
 		d.Targets = core.TargetAll
 
-		c.QueueDmg(&d, f+travel+90)
+		c.QueueDmg(d, f+travel+90)
 
 		// Particles are emitted after the ambush thing hits
 		c.QueueParticle("sara", 3, core.Electro, f+travel+90)
@@ -124,7 +124,7 @@ func (c *char) Skill(p map[string]int) (int, int) {
 		d.Targets = core.TargetAll
 		d.Mult = .3 * d.Mult
 
-		c.QueueDmg(&d, 90)
+		c.QueueDmg(d, 90)
 
 		c.attackBuff(90)
 		c.a4(90)
@@ -226,7 +226,7 @@ func (c *char) Burst(p map[string]int) (int, int) {
 
 		if waveClusterHits%10 == 1 {
 			// Actual hit procs after the full cast duration, or 80 frames
-			c.QueueDmg(&dTitanbreaker, f+20)
+			c.QueueDmg(dTitanbreaker, f+20)
 			c.c1(f + 20)
 		}
 		if waveAttackProcs%10 == 1 {
@@ -243,8 +243,9 @@ func (c *char) Burst(p map[string]int) (int, int) {
 			waveAttackProc := int((waveAttackProcs % PowInt(10, waveN+2)) / PowInt(10, waveN+2-1))
 			if waveHits > 0 {
 				for j := 0; j < waveHits; j++ {
-					x := dStormcluster.Clone()
-					c.QueueDmg(&x, f+20+(50*(waveN+1)))
+					x := c.Core.Snapshots.Clone(dStormcluster)
+					// x := dStormcluster.Clone()
+					c.QueueDmg(x, f+20+(50*(waveN+1)))
 					c.c1(f + 20 + (50 * (waveN + 1)))
 				}
 			}
@@ -290,8 +291,10 @@ func (c *char) attackBuff(delay int) {
 		if c.Base.Cons == 6 {
 			c.Core.Events.Subscribe(core.OnAttackWillLand, func(args ...interface{}) bool {
 				ds := args[1].(*core.Snapshot)
+				//get actor name
+				name := c.Core.Chars[ds.ActorIndex].Name()
 				// No need to keep event hook if sara attack buff is not active
-				if c.Core.Status.Duration("sarabuff"+ds.Actor) <= 0 {
+				if c.Core.Status.Duration("sarabuff"+name) <= 0 {
 					return true
 				}
 				if ds.Element != core.Electro {

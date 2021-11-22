@@ -1,6 +1,10 @@
 package character
 
-import "github.com/genshinsim/gcsim/pkg/core"
+import (
+	"log"
+
+	"github.com/genshinsim/gcsim/pkg/core"
+)
 
 func (t *Tmpl) Tick() {
 }
@@ -11,6 +15,9 @@ func (t *Tmpl) AddTask(fun func(), name string, delay int) {
 }
 
 func (t *Tmpl) QueueDmg(ds *core.Snapshot, delay int) {
+	if ds == nil {
+		log.Println("nil snapshot queued from: ", t.Name())
+	}
 	t.AddTask(func() {
 		t.Core.Combat.ApplyDamage(ds)
 	}, "dmg", delay)
@@ -20,6 +27,11 @@ func (t *Tmpl) QueueDmg(ds *core.Snapshot, delay int) {
 // Best used for all abilities that do not snapshot in game (e.g. normal attacks, Hu Tao blood blossoms, etc.)
 func (t *Tmpl) QueueDmgDynamic(generateSnapshot func() *core.Snapshot, delay int) {
 	t.AddTask(func() {
+		// s := generateSnapshot()
+		// if s == nil {
+		// 	log.Println("nil snapshot from dynamic?")
+		// }
+		// t.Core.Combat.ApplyDamage(s)
 		t.Core.Combat.ApplyDamage(generateSnapshot())
 	}, "dmg", delay)
 }

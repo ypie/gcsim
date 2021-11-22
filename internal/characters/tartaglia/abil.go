@@ -31,7 +31,7 @@ func (c *char) Attack(p map[string]int) (int, int) {
 		attack[c.NormalCounter][c.TalentLvlAttack()],
 	)
 
-	c.QueueDmg(&d, f+travel)
+	c.QueueDmg(d, f+travel)
 
 	c.AdvanceNormalIndex()
 
@@ -64,7 +64,7 @@ func (c *char) meleeAttack(f, a int) (int, int) {
 				mult[c.TalentLvlSkill()],
 			)
 			d.OnHitCallback = c.rtSlashCallback
-			c.Core.Combat.ApplyDamage(&d)
+			c.Core.Combat.ApplyDamage(d)
 		}, "tartaglia-attack", f-meleeDelayOffset[c.NormalCounter][i])
 	}
 
@@ -102,7 +102,7 @@ func (c *char) Aimed(p map[string]int) (int, int) {
 	d.AnimationFrames = f
 	d.OnHitCallback = c.rtFlashCallback
 
-	c.QueueDmg(&d, travel+f)
+	c.QueueDmg(d, travel+f)
 
 	return f, a
 }
@@ -143,7 +143,7 @@ func (c *char) ChargeAttack(p map[string]int) (int, int) {
 		}
 		d.Targets = core.TargetAll
 		d.OnHitCallback = c.rtSlashCallback
-		c.Core.Combat.ApplyDamage(&d)
+		c.Core.Combat.ApplyDamage(d)
 	}, "tartaglia-charge-attack", f-meleeChargeDelayOffset[0])
 
 	c.AddTask(func() {
@@ -162,7 +162,7 @@ func (c *char) ChargeAttack(p map[string]int) (int, int) {
 		}
 		d.Targets = core.TargetAll
 		d.OnHitCallback = c.rtSlashCallback
-		c.Core.Combat.ApplyDamage(&d)
+		c.Core.Combat.ApplyDamage(d)
 	}, "tartaglia-charge-attack", f-meleeChargeDelayOffset[1])
 	return f, a
 }
@@ -194,7 +194,7 @@ func (c *char) Skill(p map[string]int) (int, int) {
 			skill[c.TalentLvlSkill()],
 		)
 		d.Targets = core.TargetAll
-		c.Core.Combat.ApplyDamage(&d)
+		c.Core.Combat.ApplyDamage(d)
 	}, "tartaglia-skill", f)
 
 	c.SetCD(core.ActionSkill, 60)
@@ -266,7 +266,7 @@ func (c *char) Burst(p map[string]int) (int, int) {
 		if c.Core.Status.Duration("tartagliamelee") > 0 {
 			d.OnHitCallback = c.rtBlastCallback
 		}
-		c.Core.Combat.ApplyDamage(&d)
+		c.Core.Combat.ApplyDamage(d)
 		if c.Core.Status.Duration("tartagliamelee") > 0 {
 			if c.Base.Cons >= 6 {
 				c.mlBurstUsed = true
@@ -303,8 +303,8 @@ func (c *char) rtFlashCallback(t core.Target) {
 
 			//proc 3 hits
 			for i := 1; i <= 3; i++ {
-				x := d.Clone()
-				c.QueueDmg(&x, i)
+				x := c.Core.Snapshots.Clone(d)
+				c.QueueDmg(x, i)
 			}
 			c.Core.Log.Debugw("Riptide Flash ticked", "frame", c.Core.F, "event", core.LogCharacterEvent, "dur",
 				c.Core.Status.Duration("tartagliamelee"), "target", t.Index(), "flashICD", c.rtFlashICD[t.Index()], "rtExpiry", c.rtExpiry[t.Index()])
@@ -337,7 +337,7 @@ func (c *char) rtSlashCallback(t core.Target) {
 			)
 			d.Targets = core.TargetAll
 
-			c.Core.Combat.ApplyDamage(&d)
+			c.Core.Combat.ApplyDamage(d)
 			c.Core.Log.Debugw("Riptide Slash ticked", "frame", c.Core.F, "event", core.LogCharacterEvent, "dur",
 				c.Core.Status.Duration("tartagliamelee"), "target", t.Index(), "slashICD", c.rtSlashICD[t.Index()], "rtExpiry", c.rtExpiry[t.Index()])
 
@@ -369,7 +369,7 @@ func (c *char) rtBlastCallback(t core.Target) {
 			)
 			d.Targets = core.TargetAll
 
-			c.Core.Combat.ApplyDamage(&d)
+			c.Core.Combat.ApplyDamage(d)
 			// triggering riptide blast will clear riptide status
 			c.rtExpiry[t.Index()] = 0
 			c.Core.Log.Debugw("Riptide Blast ticked", "frame", c.Core.F, "event", core.LogCharacterEvent, "dur",

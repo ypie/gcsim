@@ -32,7 +32,7 @@ func (t *Target) queueReaction(in *core.Snapshot, typ core.ReactionType, res cor
 	ds := t.TransReactionSnapshot(in, typ, res, true)
 
 	t.core.Tasks.Add(func() {
-		t.core.Combat.ApplyDamage(&ds)
+		t.core.Combat.ApplyDamage(ds)
 	}, delay)
 
 	//if swirl queue another
@@ -47,38 +47,33 @@ func (t *Target) queueReaction(in *core.Snapshot, typ core.ReactionType, res cor
 	ds2 := t.TransReactionSnapshot(in, typ, res, false)
 	ds2.Abil = ds2.Abil + " (aoe)"
 	t.core.Tasks.Add(func() {
-		t.core.Combat.ApplyDamage(&ds2)
+		t.core.Combat.ApplyDamage(ds2)
 	}, delay)
 }
 
 //calculate reaction extra damage here
-func (t *Target) TransReactionSnapshot(in *core.Snapshot, typ core.ReactionType, res core.Durability, selfHarm bool) core.Snapshot {
-	ds := core.Snapshot{
-		CharLvl:     in.CharLvl,
-		ActorEle:    in.ActorEle,
-		Actor:       in.Actor,
-		ActorIndex:  in.ActorIndex,
-		SourceFrame: t.core.F,
-		Abil:        string(typ),
-		ImpulseLvl:  1,
-		//reaction related
-		Mult:             0,
-		Durability:       0,
-		StrikeType:       core.StrikeTypeDefault,
-		AttackTag:        core.AttackTagNone,
-		ICDTag:           core.ICDTagNone,
-		ICDGroup:         core.ICDGroupReactionA,
-		IsReactionDamage: true,
-		ReactionType:     typ,
+func (t *Target) TransReactionSnapshot(in *core.Snapshot, typ core.ReactionType, res core.Durability, selfHarm bool) *core.Snapshot {
+	ds := t.core.Snapshots.Get()
 
-		//targetting info
-		Targets:   core.TargetAll,
-		DamageSrc: t.index,
-		SelfHarm:  selfHarm,
-
-		//no stats, should never get used
-		Stats: make([]float64, core.EndStatType),
-	}
+	ds.CharLvl = in.CharLvl
+	ds.ActorEle = in.ActorEle
+	ds.ActorIndex = in.ActorIndex
+	ds.SourceFrame = t.core.F
+	ds.Abil = string(typ)
+	ds.ImpulseLvl = 1
+	//reaction relate
+	ds.Mult = 0
+	ds.Durability = 0
+	ds.StrikeType = core.StrikeTypeDefault
+	ds.AttackTag = core.AttackTagNone
+	ds.ICDTag = core.ICDTagNone
+	ds.ICDGroup = core.ICDGroupReactionA
+	ds.IsReactionDamage = true
+	ds.ReactionType = typ
+	//targetting inf
+	ds.Targets = core.TargetAll
+	ds.DamageSrc = t.index
+	ds.SelfHarm = selfHarm
 
 	var mult float64
 	switch typ {
@@ -167,7 +162,8 @@ func (t *Target) TransReactionSnapshot(in *core.Snapshot, typ core.ReactionType,
 		}
 	default:
 		//either not implemented or no dmg
-		return core.Snapshot{}
+		ds.Clear()
+		return ds
 	}
 
 	//grab live EM

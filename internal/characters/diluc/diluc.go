@@ -132,7 +132,7 @@ func (c *char) Attack(p map[string]int) (int, int) {
 			attack[c.NormalCounter][c.TalentLvlAttack()],
 		)
 		d.Targets = core.TargetAll
-		return &d
+		return d
 	}, f-1)
 	c.AdvanceNormalIndex()
 
@@ -180,7 +180,7 @@ func (c *char) Skill(p map[string]int) (int, int) {
 				c.Core.Log.Debugw("diluc c4 adding dmg", "frame", c.Core.F, "event", core.LogCharacterEvent, "final dmg", d.Stats[core.DmgP])
 			}
 		}
-		return &d
+		return d
 	}, f-5)
 
 	//add a timer to activate c4
@@ -256,24 +256,27 @@ func (c *char) Burst(p map[string]int) (int, int) {
 		)
 		d.Targets = core.TargetAll
 
-		c.QueueDmg(&d, 1)
+		c.QueueDmg(d, 1)
 
 		//dot does damage every .2 seconds for 7 hits? so every 12 frames
 		//dot does max 7 hits + explosion, roughly every 13 frame? blows up at 210 frames
 		//first tick did 50 dur as well?
 		for i := 1; i <= dot; i++ {
-			x := d.Clone()
+			x := c.Core.Snapshots.Clone(d)
 			x.Abil = "Dawn (Tick)"
 			x.Mult = burstDOT[c.TalentLvlBurst()]
-			c.QueueDmg(&x, i+12)
+			c.QueueDmg(x, i+12)
 		}
 
 		if explode > 0 {
-			x := d.Clone()
+			x := c.Core.Snapshots.Clone(d)
 			x.Abil = "Dawn (Explode)"
 			x.Mult = burstExplode[c.TalentLvlBurst()]
-			c.QueueDmg(&x, 110)
+			c.QueueDmg(x, 110)
 		}
+
+		c.Core.Snapshots.Release(d)
+		d = nil
 	}, "diluc-burst", 100)
 
 	c.Energy = 0

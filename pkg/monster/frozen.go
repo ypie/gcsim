@@ -10,7 +10,7 @@ type AuraFrozen struct {
 	hydro    *AuraHydro
 	cryo     *AuraCyro
 	source   int
-	snapshot core.Snapshot
+	snapshot *core.Snapshot
 	t        *Target
 }
 
@@ -37,7 +37,7 @@ func newFreeze(c *AuraCyro, h *AuraHydro, dur core.Durability, t *Target, ds *co
 	fz.cryo = c
 	fz.hydro = h
 	fz.source = f
-	fz.snapshot = ds.Clone()
+	fz.snapshot = t.core.Snapshots.Clone(ds)
 	fz.t = t
 
 	fz.Start = f

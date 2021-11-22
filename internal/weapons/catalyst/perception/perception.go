@@ -20,6 +20,7 @@ func weapon(char core.Character, c *core.Core, r int, param map[string]int) {
 	cd := (13 - r) * 60
 	icd := 0
 	var w weap
+	w.c = c
 
 	c.Events.Subscribe(core.OnAttackWillLand, func(args ...interface{}) bool {
 		ds := args[1].(*core.Snapshot)
@@ -30,6 +31,8 @@ func weapon(char core.Character, c *core.Core, r int, param map[string]int) {
 			return false
 		}
 		icd = c.F + cd
+		//release the old snap
+		c.Snapshots.Release(w.snap)
 		w.snap = char.Snapshot(
 			"Eye of Perception Proc",
 			core.AttackTagWeaponSkill,
@@ -41,7 +44,7 @@ func weapon(char core.Character, c *core.Core, r int, param map[string]int) {
 			dmg,
 		)
 		w.snap.OnHitCallback = w.chainQ(0, c.F, 1, c, char)
-		char.QueueDmg(&w.snap, 1)
+		char.QueueDmg(w.snap, 1)
 		return false
 	}, fmt.Sprintf("perception-%v", char.Name()))
 
@@ -51,7 +54,8 @@ func weapon(char core.Character, c *core.Core, r int, param map[string]int) {
 }
 
 type weap struct {
-	snap core.Snapshot
+	c    *core.Core
+	snap *core.Snapshot
 }
 
 func (w *weap) chainQ(index int, src int, count int, c *core.Core, char core.Character) func(t core.Target) {
@@ -71,10 +75,11 @@ func (w *weap) chainQ(index int, src int, count int, c *core.Core, char core.Cha
 	//trigger dmg based on a clone of d
 	return func(next core.Target) {
 		// c.Log.Printf("hit target %v, frame %v, done proc %v, queuing next index: %v\n", next.Index(), char.Sim.Frame(), count, index)
-		d := w.snap.Clone()
+		// d := w.snap.Clone()
+		d := w.c.Snapshots.Clone(w.snap)
 		d.Targets = index
 		d.SourceFrame = c.F
 		d.OnHitCallback = w.chainQ(index, src, count+1, c, char)
-		char.QueueDmg(&d, 1)
+		char.QueueDmg(d, 1)
 	}
 }

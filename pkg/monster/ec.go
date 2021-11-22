@@ -15,7 +15,7 @@ type AuraEC struct {
 	hydro    *AuraHydro
 	t        *Target
 	source   int
-	snapshot core.Snapshot
+	snapshot *core.Snapshot
 }
 
 func (a *AuraEC) AuraContains(ele ...core.EleType) bool {
@@ -34,7 +34,7 @@ func newEC(e *AuraElectro, h *AuraHydro, t *Target, ds *core.Snapshot, f int) Au
 	ec.electro = e
 	ec.hydro = h
 	ec.source = f
-	ec.snapshot = ds.Clone()
+	ec.snapshot = t.core.Snapshots.Clone(ds)
 	ec.t = t
 	//on add, trigger tick in 0.1s
 	t.core.Tasks.Add(func() {
@@ -91,8 +91,9 @@ func (a *AuraEC) nextTick(src int) func() {
 			return //redundant check anyways
 		}
 		//so ec is active, which means both aura must still have value > 0; so we can do dmg
-		ds := a.snapshot.Clone()
-		a.t.queueReaction(&ds, core.ElectroCharged, 0, 1)
+		// ds := a.snapshot.Clone()
+		ds := a.t.core.Snapshots.Clone(a.snapshot)
+		a.t.queueReaction(ds, core.ElectroCharged, 0, 1)
 		//queue up next tick
 		a.t.core.Tasks.Add(a.nextTick(src), 60)
 	}
@@ -204,7 +205,7 @@ func (a *AuraEC) React(ds *core.Snapshot, t *Target) (Aura, bool) {
 	case core.Hydro:
 		//refresh hydro, update snapshot, and trigger 1 tick
 		a.hydro.Refresh(ds.Durability)
-		a.snapshot = ds.Clone()
+		a.snapshot = t.core.Snapshots.Clone(ds)
 		// a.source = t.core.F
 		//trigger tick and update tick timer
 		// t.queueReaction(ds, core.ElectroCharged, 0, 1)
@@ -222,7 +223,7 @@ func (a *AuraEC) React(ds *core.Snapshot, t *Target) (Aura, bool) {
 	case core.Electro:
 		//refresh electro, update snapshot, and trigger 1 tick
 		a.electro.Refresh(ds.Durability)
-		a.snapshot = ds.Clone()
+		a.snapshot = t.core.Snapshots.Clone(ds)
 		// a.source = t.core.F
 		//trigger tick and update tick timer
 		// t.queueReaction(ds, core.ElectroCharged, 0, 1)

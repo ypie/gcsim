@@ -14,7 +14,7 @@ func init() {
 
 type char struct {
 	*character.Tmpl
-	burstSnapshot core.Snapshot
+	burstSnapshot *core.Snapshot
 }
 
 func NewChar(s *core.Core, p core.CharacterProfile) (core.Character, error) {
@@ -137,7 +137,7 @@ func (c *char) c4() {
 
 	c.Core.Events.Subscribe(core.OnDamage, func(args ...interface{}) bool {
 		ds := args[1].(*core.Snapshot)
-		if ds.Actor != c.Base.Name {
+		if ds.ActorIndex != c.Index {
 			return false
 		}
 		if ds.AttackTag != core.AttackTagNormal && ds.AttackTag != core.AttackTagExtra {
@@ -158,7 +158,7 @@ func (c *char) c4() {
 			25,
 			0.2,
 		)
-		c.QueueDmg(&d, 1)
+		c.QueueDmg(d, 1)
 		return false
 	}, "beidou-c4")
 
@@ -178,7 +178,7 @@ func (c *char) Attack(p map[string]int) (int, int) {
 		attack[c.NormalCounter][c.TalentLvlAttack()],
 	)
 	d.Targets = core.TargetAll
-	c.QueueDmg(&d, f-1)
+	c.QueueDmg(d, f-1)
 
 	c.AdvanceNormalIndex()
 
@@ -205,7 +205,7 @@ func (c *char) Skill(p map[string]int) (int, int) {
 		skillbase[c.TalentLvlSkill()]+skillbonus[c.TalentLvlSkill()]*float64(counter),
 	)
 	d.Targets = core.TargetAll
-	c.QueueDmg(&d, f-1)
+	c.QueueDmg(d, f-1)
 
 	//2 if no hit, 3 if 1 hit, 4 if perfect
 	c.QueueParticle("beidou", 2+counter, core.Electro, 100)
@@ -243,7 +243,7 @@ func (c *char) Burst(p map[string]int) (int, int) {
 		burstonhit[c.TalentLvlBurst()],
 	)
 	d.Targets = core.TargetAll
-	c.QueueDmg(&d, f-1)
+	c.QueueDmg(d, f-1)
 
 	c.Core.Status.AddStatus("beidouburst", 900)
 	c.burstSnapshot = c.Snapshot(
@@ -299,12 +299,13 @@ func (c *char) burstProc() {
 			return false
 		}
 
-		d := c.burstSnapshot.Clone()
+		// d := c.burstSnapshot.Clone()
+		d := c.Core.Snapshots.Clone(c.burstSnapshot)
 		//on hit we have to chain
 		d.OnHitCallback = c.chainQ(t.Index(), c.Core.F, 1)
 
-		c.Core.Log.Debugw("beidou Q proc'd", "frame", c.Core.F, "event", core.LogCharacterEvent, "actor", ds.Actor, "attack tag", ds.AttackTag)
-		c.QueueDmg(&d, 1)
+		c.Core.Log.Debugw("beidou Q proc'd", "frame", c.Core.F, "event", core.LogCharacterEvent, "char", c.Index, "attack tag", ds.AttackTag)
+		c.QueueDmg(d, 1)
 
 		icd = c.Core.F + 60 // once per second
 		return false
@@ -333,10 +334,11 @@ func (c *char) chainQ(index int, src int, count int) func(t core.Target) {
 	//trigger dmg based on a clone of d
 	return func(next core.Target) {
 		// log.Printf("hit target %v, frame %v, done proc %v, queuing next index: %v\n", next.Index(), c.Core.F, count, index)
-		d := c.burstSnapshot.Clone()
+		// d := c.burstSnapshot.Clone()
+		d := c.Core.Snapshots.Clone(c.burstSnapshot)
 		d.Targets = index
 		d.SourceFrame = c.Core.F
 		d.OnHitCallback = c.chainQ(index, src, count+1)
-		c.QueueDmg(&d, 1)
+		c.QueueDmg(d, 1)
 	}
 }

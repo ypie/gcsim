@@ -107,7 +107,7 @@ func (c *char) a4() {
 				25,
 				.8,
 			)
-			return &d
+			return d
 		}, 1)
 
 		return false

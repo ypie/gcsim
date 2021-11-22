@@ -5,7 +5,8 @@ type EleType int
 
 //ElementType should be pryo, Hydro, Cryo, Electro, Geo, Anemo and maybe dendro
 const (
-	Electro EleType = iota
+	NoElement EleType = iota
+	Electro
 	Pyro
 	Anemo
 	Cryo
@@ -13,7 +14,6 @@ const (
 	Hydro
 	Dendro
 	Geo
-	NoElement
 	ElementMaxCount
 	Physical
 	EC

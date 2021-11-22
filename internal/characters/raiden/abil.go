@@ -39,7 +39,7 @@ func (c *char) Attack(p map[string]int) (int, int) {
 				25,
 				mult[c.TalentLvlAttack()],
 			)
-			return &d
+			return d
 		}, f-polearmDelayOffset[c.NormalCounter][i])
 	}
 
@@ -77,7 +77,7 @@ func (c *char) swordAttack(f int, a int) (int, int) {
 			if c.Base.Cons >= 2 {
 				d.RaidenDefAdj = 0.4
 			}
-			c.Core.Combat.ApplyDamage(&d)
+			c.Core.Combat.ApplyDamage(d)
 			//restore energy
 			if c.Core.F > c.restoreICD && c.restoreCount < 5 {
 				c.restoreCount++
@@ -117,7 +117,7 @@ func (c *char) ChargeAttack(p map[string]int) (int, int) {
 				25,
 				charge[c.TalentLvlAttack()],
 			)
-			return &d
+			return d
 		}, f-31) //TODO: damage frame
 
 		return f, a
@@ -149,7 +149,7 @@ func (c *char) swordCharge(p map[string]int) (int, int) {
 			if c.Base.Cons >= 2 {
 				d.RaidenDefAdj = 0.4
 			}
-			c.Core.Combat.ApplyDamage(&d)
+			c.Core.Combat.ApplyDamage(d)
 			//restore energy
 			if c.Core.F > c.restoreICD && c.restoreCount < 5 {
 				c.restoreCount++
@@ -190,7 +190,7 @@ func (c *char) Skill(p map[string]int) (int, int) {
 			skill[c.TalentLvlSkill()],
 		)
 		d.Targets = core.TargetAll
-		return &d
+		return d
 	}, f+19)
 
 	//activate eye
@@ -251,7 +251,7 @@ func (c *char) eyeOnDamage() {
 			if c.Base.Cons >= 2 && c.Core.Status.Duration("raidenburst") > 0 {
 				d.RaidenDefAdj = 0.4
 			}
-			return &d
+			return d
 		}, 5)
 		c.eyeICD = c.Core.F + 54 //0.9 sec icd
 		return false
@@ -308,7 +308,7 @@ func (c *char) Burst(p map[string]int) (int, int) {
 		if c.Base.Cons >= 2 {
 			d.RaidenDefAdj = 0.4
 		}
-		return &d
+		return d
 	}, f)
 
 	c.SetCD(core.ActionBurst, 18*60) //20s cd

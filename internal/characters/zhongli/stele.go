@@ -72,8 +72,8 @@ func (c *char) resonance(src, max int) func() {
 		}
 		orb := false
 		for i := 0; i < count; i++ {
-			x := d.Clone()
-			c.Core.Combat.ApplyDamage(&x)
+			x := c.Core.Snapshots.Clone(d)
+			c.Core.Combat.ApplyDamage(x)
 			if c.energyICD < c.Core.F && !orb && c.Core.Rand.Float64() < .5 {
 				orb = true
 			}

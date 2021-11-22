@@ -105,9 +105,9 @@ func (c *char) Attack(p map[string]int) (int, int) {
 		}
 		//refresh cooldown of seal every hit regardless if we got more stacks
 		// c.CD["seal"] = s.F + 600
-		x := d.Clone()
-		c.Core.Combat.ApplyDamage(&d)
-		c.Core.Combat.ApplyDamage(&x)
+		x := c.Core.Snapshots.Clone(d)
+		c.Core.Combat.ApplyDamage(d)
+		c.Core.Combat.ApplyDamage(x)
 	}, "ningguang-attack", f+travel)
 
 	return f, a
@@ -132,7 +132,7 @@ func (c *char) ChargeAttack(p map[string]int) (int, int) {
 		charge[c.TalentLvlAttack()],
 	)
 
-	c.QueueDmg(&d, f+travel)
+	c.QueueDmg(d, f+travel)
 
 	d1 := c.Snapshot(
 		"Charge (Gems)",
@@ -146,8 +146,10 @@ func (c *char) ChargeAttack(p map[string]int) (int, int) {
 	)
 	j := c.Tags["jade"]
 	for i := 0; i < j; i++ {
-		x := d1.Clone()
-		c.QueueDmg(&x, f+travel)
+
+		// x := d1.Clone()
+		x := c.Core.Snapshots.Clone(d1)
+		c.QueueDmg(x, f+travel)
 	}
 	c.Tags["jade"] = 0
 
@@ -169,7 +171,7 @@ func (c *char) Skill(p map[string]int) (int, int) {
 	)
 	d.Targets = core.TargetAll
 
-	c.QueueDmg(&d, f)
+	c.QueueDmg(d, f)
 
 	//put skill on cd first then check for construct/c2
 	c.SetCD(core.ActionSkill, 720)
@@ -287,8 +289,8 @@ func (c *char) Burst(p map[string]int) (int, int) {
 
 	//geo applied 1 4 7 10, +3 pattern; or 0 3 6 9
 	for i := 0; i < count; i++ {
-		x := d.Clone()
-		c.QueueDmg(&x, f+travel)
+		x := c.Core.Snapshots.Clone(d)
+		c.QueueDmg(x, f+travel)
 	}
 
 	if c.Base.Cons == 6 {

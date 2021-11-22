@@ -35,7 +35,7 @@ func (c *char) Attack(p map[string]int) (int, int) {
 		c.sealExpiry = c.Core.F + 600
 		c.Core.Log.Debugw("yanfei gained a seal from normal attack", "frame", c.Core.F, "event", core.LogCharacterEvent, "char", c.Index, "current_seals", c.Tags["seal"], "expiry", c.sealExpiry)
 
-		c.Core.Combat.ApplyDamage(&d)
+		c.Core.Combat.ApplyDamage(d)
 	}, "yanfei-attack", f+travel)
 
 	c.AdvanceNormalIndex()
@@ -81,7 +81,7 @@ func (c *char) ChargeAttack(p map[string]int) (int, int) {
 	d.Targets = core.TargetAll
 
 	// TODO: Not sure of snapshot timing
-	c.QueueDmg(&d, f)
+	c.QueueDmg(d, f)
 
 	c.Core.Log.Debugw("yanfei charge attack consumed seals", "frame", c.Core.F, "event", core.LogCharacterEvent, "char", c.Index, "current_seals", c.Tags["seal"], "expiry", c.sealExpiry)
 
@@ -121,7 +121,7 @@ func (c *char) Skill(p map[string]int) (int, int) {
 
 		c.Core.Log.Debugw("yanfei gained max seals", "frame", c.Core.F, "event", core.LogCharacterEvent, "char", c.Index, "current_seals", c.Tags["seal"], "expiry", c.sealExpiry)
 
-		c.Core.Combat.ApplyDamage(&d)
+		c.Core.Combat.ApplyDamage(d)
 
 	}, "yanfei-skill", f)
 
@@ -174,7 +174,7 @@ func (c *char) Burst(p map[string]int) (int, int) {
 
 		c.Core.Log.Debugw("yanfei gained max seals", "frame", c.Core.F, "event", core.LogCharacterEvent, "char", c.Index, "current_seals", c.Tags["seal"], "expiry", c.sealExpiry)
 
-		c.Core.Combat.ApplyDamage(&d)
+		c.Core.Combat.ApplyDamage(d)
 	}, "yanfei-burst", f)
 
 	c.AddTask(c.burstAddSealHook(), "burst-add-seals-task", 60)

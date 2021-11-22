@@ -112,7 +112,7 @@ func (c *char) Attack(p map[string]int) (int, int) {
 		attack[c.NormalCounter][c.TalentLvlAttack()],
 	)
 
-	c.QueueDmg(&d, f-1)
+	c.QueueDmg(d, f-1)
 	c.AdvanceNormalIndex()
 
 	return f, a
@@ -134,7 +134,7 @@ func (c *char) ChargeAttack(p map[string]int) (int, int) {
 		charge[c.TalentLvlAttack()],
 	)
 
-	c.QueueDmg(&d, f-1)
+	c.QueueDmg(d, f-1)
 
 	//a2 add a stack
 	if c.Tags["stack"] < 3 {
@@ -183,7 +183,7 @@ func (c *char) skillPress(p map[string]int) (int, int) {
 	if c.Tags["stack"] < 3 {
 		c.Tags["stack"]++
 	}
-	c.QueueDmg(&d, f-1)
+	c.QueueDmg(d, f-1)
 
 	if c.Core.Rand.Float64() < 0.5 {
 		c.QueueParticle("Lisa", 1, core.Electro, f+100)
@@ -206,7 +206,7 @@ func (c *char) skillHold(p map[string]int) (int, int) {
 		skillHold[c.Tags["stack"]][c.TalentLvlSkill()],
 	)
 	c.Tags["stack"] = 0 //consume all stacks
-	c.QueueDmg(&d, f-1)
+	c.QueueDmg(d, f-1)
 
 	//c2 add defense? no interruptions either way
 	if c.Base.Cons >= 2 {
@@ -249,7 +249,7 @@ func (c *char) Burst(p map[string]int) (int, int) {
 		0.1,
 	)
 	//duration is 15 seconds, tick every .5 sec
-	c.QueueDmg(&d, f)
+	c.QueueDmg(d, f)
 	//30 zaps once every 30 frame, starting at f
 
 	d = c.Snapshot(
@@ -264,8 +264,8 @@ func (c *char) Burst(p map[string]int) (int, int) {
 	)
 
 	for i := 30; i <= 900; i += 30 {
-		x := d.Clone()
-		c.QueueDmg(&x, f+i)
+		x := c.Core.Snapshots.Clone(d)
+		c.QueueDmg(x, f+i)
 	}
 
 	//add a status for this just in case someone cares

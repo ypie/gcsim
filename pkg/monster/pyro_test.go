@@ -46,7 +46,7 @@ func TestPyroAura(t *testing.T) {
 
 	//TEST ATTACH
 
-	c.Combat.ApplyDamage(&core.Snapshot{
+	c.Combat.ApplyDamage(core.Snapshot{
 		Durability: 25,
 		Element:    core.Pyro,
 		ICDTag:     core.ICDTagNone,
@@ -72,7 +72,7 @@ func TestPyroAura(t *testing.T) {
 	}
 
 	//TEST REFRESH
-	c.Combat.ApplyDamage(&core.Snapshot{
+	c.Combat.ApplyDamage(core.Snapshot{
 		Durability: 50,
 		Element:    core.Pyro,
 		ICDTag:     core.ICDTagNone,

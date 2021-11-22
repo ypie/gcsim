@@ -23,7 +23,7 @@ func (c *char) Attack(p map[string]int) (int, int) {
 			25,
 			mult[c.TalentLvlAttack()],
 		)
-		c.QueueDmg(&d, f-5+i)
+		c.QueueDmg(d, f-5+i)
 	}
 
 	c.AdvanceNormalIndex()
@@ -49,7 +49,7 @@ func (c *char) ChargeAttack(p map[string]int) (int, int) {
 		nc[c.TalentLvlAttack()],
 	)
 
-	c.QueueDmg(&d, f-1)
+	c.QueueDmg(d, f-1)
 
 	//return animation cd
 	return f, a
@@ -75,7 +75,7 @@ func (c *char) Skill(p map[string]int) (int, int) {
 	)
 
 	// First hit comes out 20 frames before second
-	c.QueueDmg(&d, f-20)
+	c.QueueDmg(d, f-20)
 
 	// A1 activation
 	// When Rosaria strikes an opponent from behind using Ravaging Confession, Rosaria's CRIT RATE increases by 12% for 5s.
@@ -105,7 +105,7 @@ func (c *char) Skill(p map[string]int) (int, int) {
 		skill[1][c.TalentLvlSkill()],
 	)
 
-	c.QueueDmg(&d2, f-1)
+	c.QueueDmg(d2, f-1)
 
 	// Particles are emitted after the second hit lands
 	c.QueueParticle("rosaria", 3, core.Cryo, f+100)
@@ -137,7 +137,7 @@ func (c *char) Burst(p map[string]int) (int, int) {
 		burst[0][c.TalentLvlBurst()],
 	)
 	hit1.Targets = core.TargetAll
-	c.applyC6(&hit1)
+	c.applyC6(hit1)
 
 	hit2 := c.Snapshot(
 		"Rites of Termination (Hit 2)",
@@ -150,13 +150,13 @@ func (c *char) Burst(p map[string]int) (int, int) {
 		burst[1][c.TalentLvlBurst()],
 	)
 	hit2.Targets = core.TargetAll
-	c.applyC6(&hit2)
+	c.applyC6(hit2)
 
 	// Hit 1 comes out on frame 10
 	// 2nd hit comes after lance drop animation finishes
-	c.QueueDmg(&hit1, 10)
+	c.QueueDmg(hit1, 10)
 	// Note old code set the hit 10 frames before the recorded one - not sure why
-	c.QueueDmg(&hit2, f-10)
+	c.QueueDmg(hit2, f-10)
 
 	//duration is 8 second (extended by c2 by 4s), + 0.5
 	dur := 510
@@ -165,7 +165,7 @@ func (c *char) Burst(p map[string]int) (int, int) {
 	}
 
 	// Burst is snapshot when the lance lands (when the 2nd damage proc hits)
-	var dot core.Snapshot
+	var dot *core.Snapshot
 
 	c.AddTask(func() {
 		dot = c.Snapshot(
@@ -178,13 +178,14 @@ func (c *char) Burst(p map[string]int) (int, int) {
 			25,
 			burstDot[c.TalentLvlBurst()],
 		)
-		c.applyC6(&dot)
+		c.applyC6(dot)
 		dot.Targets = core.TargetAll
 
 		// dot every 2 second after lance lands
 		for i := 120; i < dur; i += 120 {
-			x := dot.Clone()
-			c.QueueDmg(&x, 10+i)
+			x := c.Core.Snapshots.Clone(dot)
+			// x := dot.Clone()
+			c.QueueDmg(x, 10+i)
 		}
 	}, "rosaria-snapshot", f-10)
 

@@ -105,7 +105,7 @@ func (c *char) Attack(p map[string]int) (int, int) {
 		)
 		d.Targets = core.TargetAll
 
-		return &d
+		return d
 	}, f-1)
 	c.AdvanceNormalIndex()
 
@@ -155,7 +155,7 @@ func (c *char) skillPress() {
 		)
 		d.Targets = core.TargetAll
 
-		return &d
+		return d
 	}, 15)
 
 	//25 % chance of 3 orbs
@@ -184,7 +184,7 @@ func (c *char) skillHoldShort() {
 			)
 			d.Targets = core.TargetAll
 
-			return &d
+			return d
 		}, delay[i])
 	}
 
@@ -215,7 +215,7 @@ func (c *char) skillHoldLong() {
 			)
 			d.Targets = core.TargetAll
 
-			return &d
+			return d
 		}, delay[i])
 	}
 
@@ -232,7 +232,7 @@ func (c *char) skillHoldLong() {
 		)
 		d2.Targets = core.TargetAll
 
-		return &d2
+		return d2
 	}, 198)
 
 	//25 % chance of 3 orbs
@@ -264,27 +264,18 @@ func (c *char) Burst(p map[string]int) (int, int) {
 			burst[c.TalentLvlBurst()],
 		)
 		d.Targets = core.TargetAll
-		c.Core.Combat.ApplyDamage(&d)
+		c.Core.Combat.ApplyDamage(d)
 	}, "bt-q", 33)
 
-	d := c.Snapshot(
-		"Fantastic Voyage (Heal)",
-		core.AttackTagNone,
-		core.ICDTagNone,
-		core.ICDGroupDefault,
-		core.StrikeTypeDefault,
-		core.NoElement,
-		0,
-		0,
-	)
+	hpp := c.Stat(core.Heal)
 
 	//apply right away
-	c.applyBennettField(d)()
+	c.applyBennettField(hpp)()
 
 	//add 12 ticks starting at t = 1 to t= 12
 	//TODO confirm if starts at t=1 or after animation
 	for i := 0; i <= 720; i += 60 {
-		c.AddTask(c.applyBennettField(d), "bennett-field", i)
+		c.AddTask(c.applyBennettField(hpp), "bennett-field", i)
 	}
 
 	c.Energy = 0
@@ -292,8 +283,7 @@ func (c *char) Burst(p map[string]int) (int, int) {
 	return f, a //todo fix field cast time
 }
 
-func (c *char) applyBennettField(d core.Snapshot) func() {
-	hpplus := d.Stats[core.Heal]
+func (c *char) applyBennettField(hpplus float64) func() {
 	heal := (bursthp[c.TalentLvlBurst()] + bursthpp[c.TalentLvlBurst()]*c.MaxHP()) * (1 + hpplus)
 	pc := burstatk[c.TalentLvlBurst()]
 	if c.Base.Cons >= 1 {

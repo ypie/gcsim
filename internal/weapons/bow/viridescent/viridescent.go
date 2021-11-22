@@ -51,9 +51,11 @@ func weapon(char core.Character, c *core.Core, r int, param map[string]int) {
 		)
 		d.Targets = core.TargetAll
 		for i := 0; i <= 240; i += 30 {
-			x := d.Clone()
-			char.QueueDmg(&x, i)
+			x := c.Snapshots.Clone(d)
+			char.QueueDmg(x, i)
 		}
+		c.Snapshots.Release(d)
+		d = nil
 
 		//trigger cd
 		icd = c.F + cd

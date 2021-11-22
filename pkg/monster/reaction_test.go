@@ -60,7 +60,7 @@ func TestMelt(t *testing.T) {
 	fmt.Println("----melt testing----")
 
 	target.aura = nil
-	c.Combat.ApplyDamage(&core.Snapshot{
+	c.Combat.ApplyDamage(core.Snapshot{
 		Durability: 50,
 		Element:    core.Pyro,
 		ICDTag:     core.ICDTagNone,
@@ -98,7 +98,7 @@ func TestMelt(t *testing.T) {
 	ampMult = 0
 
 	target.aura = nil
-	c.Combat.ApplyDamage(&core.Snapshot{
+	c.Combat.ApplyDamage(core.Snapshot{
 		Durability: 100,
 		Element:    core.Cryo,
 		ICDTag:     core.ICDTagNone,
@@ -179,7 +179,7 @@ func TestSuperconduct(t *testing.T) {
 
 	//TEST SUPERCONDUCT
 	target.aura = nil
-	c.Combat.ApplyDamage(&core.Snapshot{
+	c.Combat.ApplyDamage(core.Snapshot{
 		Durability: 25,
 		Element:    core.Cryo,
 		ICDTag:     core.ICDTagNone,
@@ -188,7 +188,7 @@ func TestSuperconduct(t *testing.T) {
 		Targets:    core.TargetAll,
 		DamageSrc:  -1,
 	})
-	c.Combat.ApplyDamage(&core.Snapshot{
+	c.Combat.ApplyDamage(core.Snapshot{
 		CharLvl:    90,
 		Durability: 25,
 		Element:    core.Electro,
@@ -212,7 +212,7 @@ func TestSuperconduct(t *testing.T) {
 	dmgCount = 0
 
 	target.aura = nil
-	c.Combat.ApplyDamage(&core.Snapshot{
+	c.Combat.ApplyDamage(core.Snapshot{
 		Durability: 25,
 		Element:    core.Electro,
 		ICDTag:     core.ICDTagNone,
@@ -221,7 +221,7 @@ func TestSuperconduct(t *testing.T) {
 		Targets:    core.TargetAll,
 		DamageSrc:  -1,
 	})
-	c.Combat.ApplyDamage(&core.Snapshot{
+	c.Combat.ApplyDamage(core.Snapshot{
 		CharLvl:    90,
 		Durability: 25,
 		Element:    core.Cryo,
@@ -289,7 +289,7 @@ func TestOverload(t *testing.T) {
 	fmt.Println("----overload testing----")
 
 	target.aura = nil
-	c.Combat.ApplyDamage(&core.Snapshot{
+	c.Combat.ApplyDamage(core.Snapshot{
 		Durability: 25,
 		Element:    core.Electro,
 		ICDTag:     core.ICDTagNone,
@@ -298,7 +298,7 @@ func TestOverload(t *testing.T) {
 		Targets:    core.TargetAll,
 		DamageSrc:  -1,
 	})
-	c.Combat.ApplyDamage(&core.Snapshot{
+	c.Combat.ApplyDamage(core.Snapshot{
 		CharLvl:    90,
 		Durability: 25,
 		Element:    core.Pyro,
@@ -322,7 +322,7 @@ func TestOverload(t *testing.T) {
 	dmgCount = 0
 
 	target.aura = nil
-	c.Combat.ApplyDamage(&core.Snapshot{
+	c.Combat.ApplyDamage(core.Snapshot{
 		Durability: 25,
 		Element:    core.Pyro,
 		ICDTag:     core.ICDTagNone,
@@ -331,7 +331,7 @@ func TestOverload(t *testing.T) {
 		Targets:    core.TargetAll,
 		DamageSrc:  -1,
 	})
-	c.Combat.ApplyDamage(&core.Snapshot{
+	c.Combat.ApplyDamage(core.Snapshot{
 		CharLvl:    90,
 		Durability: 25,
 		Element:    core.Electro,
@@ -409,7 +409,7 @@ func TestMultiOverload(t *testing.T) {
 	fmt.Println("----multi target overload testing----")
 
 	targetA.aura = nil
-	c.Combat.ApplyDamage(&core.Snapshot{
+	c.Combat.ApplyDamage(core.Snapshot{
 		ActorIndex: 0,
 		Durability: 100,
 		Element:    core.Electro,
@@ -419,7 +419,7 @@ func TestMultiOverload(t *testing.T) {
 		Targets:    0,
 		DamageSrc:  -1,
 	})
-	c.Combat.ApplyDamage(&core.Snapshot{
+	c.Combat.ApplyDamage(core.Snapshot{
 		CharLvl:    90,
 		ActorIndex: 0,
 		Durability: 25,
@@ -445,7 +445,7 @@ func TestMultiOverload(t *testing.T) {
 
 	//there should be electro left still = 80-25-1 tick delay
 	//trigger overload again, should be no dmg this time
-	c.Combat.ApplyDamage(&core.Snapshot{
+	c.Combat.ApplyDamage(core.Snapshot{
 		ActorIndex: 0,
 		CharLvl:    90,
 		Durability: 25,
@@ -520,7 +520,7 @@ func TestVaporize(t *testing.T) {
 	fmt.Println("----vaporize testing----")
 
 	target.aura = nil
-	c.Combat.ApplyDamage(&core.Snapshot{
+	c.Combat.ApplyDamage(core.Snapshot{
 		Durability: 100,
 		Element:    core.Pyro,
 		ICDTag:     core.ICDTagNone,
@@ -557,7 +557,7 @@ func TestVaporize(t *testing.T) {
 	ampMult = 0
 
 	target.aura = nil
-	c.Combat.ApplyDamage(&core.Snapshot{
+	c.Combat.ApplyDamage(core.Snapshot{
 		Durability: 50,
 		Element:    core.Hydro,
 		ICDTag:     core.ICDTagNone,
@@ -640,7 +640,7 @@ func TestCrystallize(t *testing.T) {
 	fmt.Println("----crystallize testing----")
 
 	target.aura = nil
-	c.Combat.ApplyDamage(&core.Snapshot{
+	c.Combat.ApplyDamage(core.Snapshot{
 		Durability: 50,
 		Element:    core.Pyro,
 		ICDTag:     core.ICDTagNone,
@@ -650,7 +650,7 @@ func TestCrystallize(t *testing.T) {
 		DamageSrc:  -1,
 	})
 
-	c.Combat.ApplyDamage(&core.Snapshot{
+	c.Combat.ApplyDamage(core.Snapshot{
 		CharLvl:    90,
 		Durability: 25,
 		Element:    core.Geo,
@@ -680,7 +680,7 @@ func TestCrystallize(t *testing.T) {
 	}
 
 	target.aura = nil
-	c.Combat.ApplyDamage(&core.Snapshot{
+	c.Combat.ApplyDamage(core.Snapshot{
 		Durability: 50,
 		Element:    core.Hydro,
 		ICDTag:     core.ICDTagNone,
@@ -690,7 +690,7 @@ func TestCrystallize(t *testing.T) {
 		DamageSrc:  -1,
 	})
 
-	c.Combat.ApplyDamage(&core.Snapshot{
+	c.Combat.ApplyDamage(core.Snapshot{
 		CharLvl:    90,
 		Durability: 25,
 		Element:    core.Geo,
@@ -720,7 +720,7 @@ func TestCrystallize(t *testing.T) {
 	}
 
 	target.aura = nil
-	c.Combat.ApplyDamage(&core.Snapshot{
+	c.Combat.ApplyDamage(core.Snapshot{
 		Durability: 50,
 		Element:    core.Cryo,
 		ICDTag:     core.ICDTagNone,
@@ -730,7 +730,7 @@ func TestCrystallize(t *testing.T) {
 		DamageSrc:  -1,
 	})
 
-	c.Combat.ApplyDamage(&core.Snapshot{
+	c.Combat.ApplyDamage(core.Snapshot{
 		CharLvl:    90,
 		Durability: 25,
 		Element:    core.Geo,
@@ -760,7 +760,7 @@ func TestCrystallize(t *testing.T) {
 	}
 
 	target.aura = nil
-	c.Combat.ApplyDamage(&core.Snapshot{
+	c.Combat.ApplyDamage(core.Snapshot{
 		Durability: 50,
 		Element:    core.Electro,
 		ICDTag:     core.ICDTagNone,
@@ -770,7 +770,7 @@ func TestCrystallize(t *testing.T) {
 		DamageSrc:  -1,
 	})
 
-	c.Combat.ApplyDamage(&core.Snapshot{
+	c.Combat.ApplyDamage(core.Snapshot{
 		CharLvl:    90,
 		Durability: 25,
 		Element:    core.Geo,
@@ -851,7 +851,7 @@ func TestSwirl(t *testing.T) {
 	fmt.Println("----swirl testing----")
 
 	target.aura = nil
-	c.Combat.ApplyDamage(&core.Snapshot{
+	c.Combat.ApplyDamage(core.Snapshot{
 		Durability: 25,
 		Element:    core.Cryo,
 		ICDTag:     core.ICDTagNone,
@@ -860,7 +860,7 @@ func TestSwirl(t *testing.T) {
 		Targets:    core.TargetAll,
 		DamageSrc:  -1,
 	})
-	c.Combat.ApplyDamage(&core.Snapshot{
+	c.Combat.ApplyDamage(core.Snapshot{
 		CharLvl:    90,
 		Durability: 25,
 		Element:    core.Anemo,
@@ -891,7 +891,7 @@ func TestSwirl(t *testing.T) {
 	c.Skip(120)
 
 	target.aura = nil
-	c.Combat.ApplyDamage(&core.Snapshot{
+	c.Combat.ApplyDamage(core.Snapshot{
 		Durability: 25,
 		Element:    core.Pyro,
 		ICDTag:     core.ICDTagNone,
@@ -900,7 +900,7 @@ func TestSwirl(t *testing.T) {
 		Targets:    core.TargetAll,
 		DamageSrc:  -1,
 	})
-	c.Combat.ApplyDamage(&core.Snapshot{
+	c.Combat.ApplyDamage(core.Snapshot{
 		CharLvl:    90,
 		Durability: 25,
 		Element:    core.Anemo,
@@ -931,7 +931,7 @@ func TestSwirl(t *testing.T) {
 	c.Skip(120)
 
 	target.aura = nil
-	c.Combat.ApplyDamage(&core.Snapshot{
+	c.Combat.ApplyDamage(core.Snapshot{
 		Durability: 25,
 		Element:    core.Hydro,
 		ICDTag:     core.ICDTagNone,
@@ -940,7 +940,7 @@ func TestSwirl(t *testing.T) {
 		Targets:    core.TargetAll,
 		DamageSrc:  -1,
 	})
-	c.Combat.ApplyDamage(&core.Snapshot{
+	c.Combat.ApplyDamage(core.Snapshot{
 		CharLvl:    90,
 		Durability: 25,
 		Element:    core.Anemo,
@@ -971,7 +971,7 @@ func TestSwirl(t *testing.T) {
 	c.Skip(120)
 
 	target.aura = nil
-	c.Combat.ApplyDamage(&core.Snapshot{
+	c.Combat.ApplyDamage(core.Snapshot{
 		Durability: 25,
 		Element:    core.Electro,
 		ICDTag:     core.ICDTagNone,
@@ -980,7 +980,7 @@ func TestSwirl(t *testing.T) {
 		Targets:    core.TargetAll,
 		DamageSrc:  -1,
 	})
-	c.Combat.ApplyDamage(&core.Snapshot{
+	c.Combat.ApplyDamage(core.Snapshot{
 		CharLvl:    90,
 		Durability: 25,
 		Element:    core.Anemo,
@@ -1072,7 +1072,7 @@ func TestSwirlMultiTarget(t *testing.T) {
 
 	targetA.aura = nil
 	targetB.aura = nil
-	c.Combat.ApplyDamage(&core.Snapshot{
+	c.Combat.ApplyDamage(core.Snapshot{
 		Durability: 50,
 		Element:    core.Cryo,
 		ICDTag:     core.ICDTagNone,
@@ -1081,7 +1081,7 @@ func TestSwirlMultiTarget(t *testing.T) {
 		Targets:    0,
 		DamageSrc:  -1,
 	})
-	c.Combat.ApplyDamage(&core.Snapshot{
+	c.Combat.ApplyDamage(core.Snapshot{
 		CharLvl:    90,
 		Durability: 25,
 		Element:    core.Anemo,

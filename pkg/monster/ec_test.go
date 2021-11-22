@@ -54,7 +54,7 @@ func TestElectroOnHydro(t *testing.T) {
 	c.Init()
 
 	//TEST SWIRL
-	c.Combat.ApplyDamage(&core.Snapshot{
+	c.Combat.ApplyDamage(core.Snapshot{
 		Durability: 25,
 		Element:    core.Electro,
 		ICDTag:     core.ICDTagNone,
@@ -63,7 +63,7 @@ func TestElectroOnHydro(t *testing.T) {
 		Targets:    core.TargetAll,
 		DamageSrc:  -1,
 	})
-	c.Combat.ApplyDamage(&core.Snapshot{
+	c.Combat.ApplyDamage(core.Snapshot{
 		CharLvl:    90,
 		Durability: 25,
 		Element:    core.Hydro,
@@ -173,7 +173,7 @@ func TestHydroOnElectro(t *testing.T) {
 	fmt.Println("----testing applying 25 electro on 25 hydro (no delay)----")
 
 	//TEST SWIRL
-	c.Combat.ApplyDamage(&core.Snapshot{
+	c.Combat.ApplyDamage(core.Snapshot{
 		Durability: 25,
 		Element:    core.Hydro,
 		ICDTag:     core.ICDTagNone,
@@ -182,7 +182,7 @@ func TestHydroOnElectro(t *testing.T) {
 		Targets:    core.TargetAll,
 		DamageSrc:  -1,
 	})
-	c.Combat.ApplyDamage(&core.Snapshot{
+	c.Combat.ApplyDamage(core.Snapshot{
 		CharLvl:    90,
 		Durability: 25,
 		Element:    core.Electro,
@@ -285,7 +285,7 @@ func TestECChain(t *testing.T) {
 	c.Init()
 
 	fmt.Println("----testing 25 hydro + 25 electro, wait 1 sec, + 25 electro----")
-	c.Combat.ApplyDamage(&core.Snapshot{
+	c.Combat.ApplyDamage(core.Snapshot{
 		Durability: 25,
 		Element:    core.Hydro,
 		ICDTag:     core.ICDTagNone,
@@ -294,7 +294,7 @@ func TestECChain(t *testing.T) {
 		Targets:    core.TargetAll,
 		DamageSrc:  -1,
 	})
-	c.Combat.ApplyDamage(&core.Snapshot{
+	c.Combat.ApplyDamage(core.Snapshot{
 		CharLvl:    90,
 		Durability: 25,
 		Element:    core.Electro,
@@ -331,7 +331,7 @@ func TestECChain(t *testing.T) {
 	}
 	dmgCount = 0
 	//add 10 electro, should trigger 1 dmg immediately, + wane in 6 frames
-	c.Combat.ApplyDamage(&core.Snapshot{
+	c.Combat.ApplyDamage(core.Snapshot{
 		CharLvl:    90,
 		Durability: 25,
 		Element:    core.Electro,
@@ -434,7 +434,7 @@ func TestECHydroChain(t *testing.T) {
 	c.Init()
 
 	fmt.Println("----testing 25 hydro + 25 electro, wait 1 sec, + 25 hydro----")
-	c.Combat.ApplyDamage(&core.Snapshot{
+	c.Combat.ApplyDamage(core.Snapshot{
 		Durability: 25,
 		Element:    core.Hydro,
 		ICDTag:     core.ICDTagNone,
@@ -443,7 +443,7 @@ func TestECHydroChain(t *testing.T) {
 		Targets:    core.TargetAll,
 		DamageSrc:  -1,
 	})
-	c.Combat.ApplyDamage(&core.Snapshot{
+	c.Combat.ApplyDamage(core.Snapshot{
 		CharLvl:    90,
 		Durability: 25,
 		Element:    core.Electro,
@@ -480,7 +480,7 @@ func TestECHydroChain(t *testing.T) {
 	}
 	dmgCount = 0
 	//add 10 electro, should trigger 1 dmg immediately, + wane in 6 frames
-	c.Combat.ApplyDamage(&core.Snapshot{
+	c.Combat.ApplyDamage(core.Snapshot{
 		CharLvl:    90,
 		Durability: 25,
 		Element:    core.Hydro,
@@ -576,7 +576,7 @@ func TestECSwirl(t *testing.T) {
 
 	fmt.Println("----testing 25/25 ec +  25 anemo swirl----")
 
-	c.Combat.ApplyDamage(&core.Snapshot{
+	c.Combat.ApplyDamage(core.Snapshot{
 		Durability: 25,
 		Element:    core.Hydro,
 		ICDTag:     core.ICDTagNone,
@@ -585,7 +585,7 @@ func TestECSwirl(t *testing.T) {
 		Targets:    core.TargetAll,
 		DamageSrc:  -1,
 	})
-	c.Combat.ApplyDamage(&core.Snapshot{
+	c.Combat.ApplyDamage(core.Snapshot{
 		CharLvl:    90,
 		Durability: 25,
 		Element:    core.Electro,
@@ -625,7 +625,7 @@ func TestECSwirl(t *testing.T) {
 	dmgCount = 0
 
 	//apply anemo
-	c.Combat.ApplyDamage(&core.Snapshot{
+	c.Combat.ApplyDamage(core.Snapshot{
 		CharLvl:    90,
 		Durability: 25,
 		Element:    core.Anemo,

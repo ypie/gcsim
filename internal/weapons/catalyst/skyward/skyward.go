@@ -41,10 +41,10 @@ func weapon(char core.Character, c *core.Core, r int, param map[string]int) {
 			100,
 			atk,
 		)
-		char.QueueDmg(&d, 1)
+		char.QueueDmg(d, 1)
 		for i := 0; i < 6; i++ {
-			x := d.Clone()
-			char.QueueDmg(&x, i*150)
+			x := c.Snapshots.Clone(d)
+			char.QueueDmg(x, i*150)
 		}
 		icd = c.F + 1800
 		return false

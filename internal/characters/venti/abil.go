@@ -25,7 +25,7 @@ func (c *char) Attack(p map[string]int) (int, int) {
 			25,
 			mult[c.TalentLvlAttack()],
 		)
-		c.QueueDmg(&d, f+travel+i)
+		c.QueueDmg(d, f+travel+i)
 	}
 
 	c.AdvanceNormalIndex()
@@ -55,16 +55,16 @@ func (c *char) Aimed(p map[string]int) (int, int) {
 	d.HitWeakPoint = true
 	d.AnimationFrames = f
 
-	c.QueueDmg(&d, travel+f)
+	c.QueueDmg(d, travel+f)
 
 	if c.Base.Cons >= 1 {
-		d1 := d.Clone()
+		d1 := c.Core.Snapshots.Clone(d)
 		d1.Mult = d.Mult / 3.0
 		d1.Abil = "Aim (Charged) C1"
-		d2 := d1.Clone()
+		d2 := c.Core.Snapshots.Clone(d1)
 
-		c.QueueDmg(&d1, travel+f)
-		c.QueueDmg(&d2, travel+f)
+		c.QueueDmg(d1, travel+f)
+		c.QueueDmg(d2, travel+f)
 	}
 
 	return f, a
@@ -92,10 +92,10 @@ func (c *char) Skill(p map[string]int) (int, int) {
 	}
 
 	if c.Base.Cons >= 2 {
-		c.applyC2(&d)
+		c.applyC2(d)
 	}
 
-	c.QueueDmg(&d, f-1)
+	c.QueueDmg(d, f-1)
 
 	c.QueueParticle("venti", 4, core.Anemo, f+100)
 
@@ -122,12 +122,12 @@ func (c *char) Burst(p map[string]int) (int, int) {
 	d.Targets = core.TargetAll
 
 	if c.Base.Cons == 6 {
-		c.applyC6(&d, core.Anemo)
+		c.applyC6(d, core.Anemo)
 	}
 
 	for i := 24; i <= 480; i += 24 {
-		x := d.Clone()
-		c.QueueDmg(&x, i)
+		x := c.Core.Snapshots.Clone(d)
+		c.QueueDmg(x, i)
 	}
 
 	c.AddTask(c.absorbCheckQ(c.Core.F, 0, int(480/18)), "venti-absorb-check", 10)
@@ -167,12 +167,12 @@ func (c *char) burstInfusedTicks() {
 	d.Targets = core.TargetAll
 
 	if c.Base.Cons == 6 {
-		c.applyC6(&d, c.qInfuse)
+		c.applyC6(d, c.qInfuse)
 	}
 
 	for i := 24; i <= 360; i += 24 {
-		x := d.Clone()
-		c.QueueDmg(&x, i)
+		x := c.Core.Snapshots.Clone(d)
+		c.QueueDmg(x, i)
 	}
 }
 

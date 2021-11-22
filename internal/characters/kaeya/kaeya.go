@@ -126,7 +126,7 @@ func (c *char) Attack(p map[string]int) (int, int) {
 		auto[c.NormalCounter][c.TalentLvlAttack()],
 	)
 
-	c.QueueDmg(&d, f-1)
+	c.QueueDmg(d, f-1)
 
 	c.AdvanceNormalIndex()
 
@@ -147,12 +147,13 @@ func (c *char) ChargeAttack(p map[string]int) (int, int) {
 		25,
 		charge[0][c.TalentLvlAttack()],
 	)
-	d2 := d.Clone()
+	// d2 := d.Clone()
+	d2 := c.Core.Snapshots.Clone(d)
 	d2.Abil = "Charge 2"
 	d2.Mult = charge[1][c.TalentLvlAttack()]
 
-	c.QueueDmg(&d, f-15) //TODO: damage frame
-	c.QueueDmg(&d2, f-5) //TODO: damage frame
+	c.QueueDmg(d, f-15) //TODO: damage frame
+	c.QueueDmg(d2, f-5) //TODO: damage frame
 
 	return f, a
 }
@@ -184,7 +185,7 @@ func (c *char) Skill(p map[string]int) (int, int) {
 	c.AddTask(func() {
 		c.Core.Health.HealActive(c.Index, heal)
 		//apply damage
-		c.Core.Combat.ApplyDamage(&d)
+		c.Core.Combat.ApplyDamage(d)
 	}, "Kaeya-Skill", 28) //TODO: assumed same as when cd starts
 
 	c.SetCD(core.ActionSkill, 360+28) //+28 since cd starts 28 frames in
@@ -222,10 +223,10 @@ func (c *char) Burst(p map[string]int) (int, int) {
 		//on icicle collision, it'll trigger an aoe dmg with radius 2
 		//in effect, every target gets hit every time icicles rotate around
 		for j := f + offset*i; j < f+480; j += 120 {
-			x := d.Clone()
+			x := c.Core.Snapshots.Clone(d)
 			x.Targets = core.TargetAll
 			x.ExtraIndex = i
-			c.QueueDmg(&x, j)
+			c.QueueDmg(x, j)
 		}
 
 	}

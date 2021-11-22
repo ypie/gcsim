@@ -46,7 +46,7 @@ func weapon(char core.Character, c *core.Core, r int, param map[string]int) {
 			dmg,
 		)
 		d.Targets = core.TargetAll
-		char.QueueDmg(&d, 1)
+		char.QueueDmg(d, 1)
 
 		atk := d.BaseAtk*(1+d.Stats[core.ATKP]) + d.Stats[core.ATK]
 

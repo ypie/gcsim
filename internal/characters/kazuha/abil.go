@@ -18,7 +18,7 @@ func (c *char) Attack(p map[string]int) (int, int) {
 			25,
 			mult[c.TalentLvlAttack()],
 		)
-		c.QueueDmg(&d, f-2+i)
+		c.QueueDmg(d, f-2+i)
 	}
 
 	c.AdvanceNormalIndex()
@@ -45,7 +45,7 @@ func (c *char) HighPlungeAttack(p map[string]int) (int, int) {
 			25,
 			plunge[c.TalentLvlAttack()],
 		)
-		c.QueueDmg(&d, f-10)
+		c.QueueDmg(d, f-10)
 	}
 
 	//aoe dmg
@@ -60,7 +60,7 @@ func (c *char) HighPlungeAttack(p map[string]int) (int, int) {
 		highPlunge[c.TalentLvlAttack()],
 	)
 	d.Targets = core.TargetAll
-	c.QueueDmg(&d, f-8)
+	c.QueueDmg(d, f-8)
 
 	// a2 if applies
 	if c.a2Ele != core.NoElement {
@@ -75,7 +75,7 @@ func (c *char) HighPlungeAttack(p map[string]int) (int, int) {
 			2, //200%
 		)
 		d.Targets = core.TargetAll
-		c.QueueDmg(&d, 10)
+		c.QueueDmg(d, 10)
 		c.a2Ele = core.NoElement
 	}
 
@@ -104,7 +104,7 @@ func (c *char) skillPress(p map[string]int) (int, int) {
 		skill[c.TalentLvlSkill()],
 	)
 	d.Targets = core.TargetAll
-	c.QueueDmg(&d, f-10)
+	c.QueueDmg(d, f-10)
 
 	c.QueueParticle("kazuha", 3, core.Anemo, 100)
 
@@ -135,7 +135,7 @@ func (c *char) skillHold(p map[string]int) (int, int) {
 		skillHold[c.TalentLvlSkill()],
 	)
 	d.Targets = core.TargetAll
-	c.QueueDmg(&d, f-10)
+	c.QueueDmg(d, f-10)
 
 	c.QueueParticle("kazuha", 4, core.Anemo, 100)
 
@@ -167,10 +167,11 @@ func (c *char) Burst(p map[string]int) (int, int) {
 		burstSlash[c.TalentLvlBurst()],
 	)
 	d.Targets = core.TargetAll
-	c.QueueDmg(&d, f-10)
+	c.QueueDmg(d, f-10)
 
 	//apply dot and check for absorb
-	d1 := d.Clone()
+	// d1 := d.Clone()
+	d1 := c.Core.Snapshots.Clone(d)
 	d1.Abil = "Kazuha Slash (Dot)"
 	d1.Mult = burstDot[c.TalentLvlBurst()]
 	d1.Durability = 25
@@ -180,7 +181,8 @@ func (c *char) Burst(p map[string]int) (int, int) {
 	//424 start
 	//493 first tick, 553, 612, 670, 729 <- so tick every second starting at 70 frames in
 	for i := 70; i < 70+60*5; i += 60 {
-		x := d1.Clone()
+		x := c.Core.Snapshots.Clone(d1)
+		// x := d1.Clone()
 		c.AddTask(func() {
 			if c.qInfuse != core.NoElement {
 				d := c.Snapshot(
@@ -194,11 +196,14 @@ func (c *char) Burst(p map[string]int) (int, int) {
 					burstEleDot[c.TalentLvlBurst()],
 				)
 				d.Targets = core.TargetAll
-				c.Core.Combat.ApplyDamage(&d)
+				c.Core.Combat.ApplyDamage(d)
 			}
-			c.Core.Combat.ApplyDamage(&x)
+			c.Core.Combat.ApplyDamage(x)
 		}, "kazuha-burst-tick", i)
 	}
+
+	c.Core.Snapshots.Release(d1)
+	d1 = nil
 
 	//reset skill cd
 	if c.Base.Cons > 0 {

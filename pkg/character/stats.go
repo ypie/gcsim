@@ -41,15 +41,15 @@ func (t *Tmpl) Stat(s core.StatType) float64 {
 	return val
 }
 
-func (c *Tmpl) Snapshot(name string, a core.AttackTag, icd core.ICDTag, g core.ICDGroup, st core.StrikeType, e core.EleType, d core.Durability, mult float64) core.Snapshot {
+func (c *Tmpl) Snapshot(name string, a core.AttackTag, icd core.ICDTag, g core.ICDGroup, st core.StrikeType, e core.EleType, d core.Durability, mult float64) *core.Snapshot {
 
-	ds := core.Snapshot{}
-	ds.Stats = make([]float64, core.EndStatType)
-	copy(ds.Stats, c.Stats)
+	ds := c.Core.Snapshots.Get()
+	for i, v := range c.Stats {
+		ds.Stats[i] = v
+	}
 
 	ds.ActorIndex = c.Index
 	ds.Abil = name
-	ds.Actor = c.Base.Name
 	ds.ActorEle = c.Base.Element
 	ds.AttackTag = a
 	ds.ICDTag = icd

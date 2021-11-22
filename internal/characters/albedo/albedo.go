@@ -14,7 +14,7 @@ func init() {
 type char struct {
 	*character.Tmpl
 	lastConstruct int
-	skillSnapshot core.Snapshot
+	skillSnapshot *core.Snapshot
 	icdSkill      int
 }
 
@@ -86,7 +86,7 @@ func (c *char) Attack(p map[string]int) (int, int) {
 		attack[c.NormalCounter][c.TalentLvlAttack()],
 	)
 
-	c.QueueDmg(&d, f-1)
+	c.QueueDmg(d, f-1)
 	c.AdvanceNormalIndex()
 
 	return f, a
@@ -106,12 +106,13 @@ func (c *char) ChargeAttack(p map[string]int) (int, int) {
 		25,
 		charge[0][c.TalentLvlAttack()],
 	)
-	d2 := d.Clone()
+	// d2 := d.Clone()
+	d2 := c.Core.Snapshots.Clone(d)
 	d2.Abil = "Charge 2"
 	d2.Mult = charge[1][c.TalentLvlAttack()]
 
-	c.QueueDmg(&d, f-15) //TODO: damage frame
-	c.QueueDmg(&d2, f-5) //TODO: damage frame
+	c.QueueDmg(d, f-15) //TODO: damage frame
+	c.QueueDmg(d2, f-5) //TODO: damage frame
 
 	return f, a
 }
@@ -169,7 +170,7 @@ func (c *char) Skill(p map[string]int) (int, int) {
 	)
 	d.Targets = core.TargetAll
 
-	c.QueueDmg(&d, f)
+	c.QueueDmg(d, f)
 
 	c.skillSnapshot = c.Snapshot(
 		"Abiogenesis: Solar Isotoma (Tick)",
@@ -214,14 +215,15 @@ func (c *char) skillHook() {
 		}
 		c.icdSkill = c.Core.F + 120 // every 2 seconds
 
-		d := c.skillSnapshot.Clone()
+		// d := c.skillSnapshot.Clone()
+		d := c.Core.Snapshots.Clone(c.skillSnapshot)
 
 		if c.Core.Flags.DamageMode && t.HP()/t.MaxHP() < .5 {
 			d.Stats[core.DmgP] += 0.25
 			c.Core.Log.Debugw("a2 proc'd, dealing extra dmg", "frame", c.Core.F, "event", core.LogCharacterEvent, "hp %", t.HP()/t.MaxHP(), "final dmg", d.Stats[core.DmgP])
 		}
 
-		c.QueueDmg(&d, 1)
+		c.QueueDmg(d, 1)
 
 		//67% chance to generate 1 geo orb
 		if c.Core.Rand.Float64() < 0.67 {
@@ -271,7 +273,7 @@ func (c *char) Burst(p map[string]int) (int, int) {
 	)
 	d.Targets = core.TargetAll
 
-	c.QueueDmg(&d, f)
+	c.QueueDmg(d, f)
 
 	d = c.Snapshot(
 		"Rite of Progeniture: Tectonic Tide (Bloom)",
@@ -292,9 +294,11 @@ func (c *char) Burst(p map[string]int) (int, int) {
 	}
 
 	for i := 0; i < hits; i++ {
-		x := d.Clone()
-		c.QueueDmg(&x, f)
+		x := c.Core.Snapshots.Clone(d)
+		c.QueueDmg(x, f)
 	}
+	c.Core.Snapshots.Release(d)
+	d = nil
 
 	//self buff EM
 	for _, char := range c.Core.Chars {

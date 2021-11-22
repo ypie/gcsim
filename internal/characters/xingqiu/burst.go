@@ -35,7 +35,7 @@ func (c *char) summonSwordWave() {
 
 				}
 			}
-			return &d
+			return d
 		}, 20)
 
 		c.burstCounter++
@@ -166,7 +166,7 @@ func (c *char) burstHook() {
 						}
 					}
 
-					c.QueueDmg(&d, 20)
+					c.QueueDmg(d, 20)
 
 				}, "sword-wave", delay)
 			} else {
@@ -199,7 +199,7 @@ func (c *char) burstHook() {
 					}
 				}
 
-				c.QueueDmg(&d, 20)
+				c.QueueDmg(d, 20)
 
 			}
 

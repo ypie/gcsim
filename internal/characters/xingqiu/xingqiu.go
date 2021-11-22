@@ -106,7 +106,7 @@ func (c *char) Attack(p map[string]int) (int, int) {
 				25,
 				mult[c.TalentLvlAttack()],
 			)
-			return &d
+			return d
 		}, delay[c.NormalCounter][i])
 	}
 
@@ -144,7 +144,7 @@ func (c *char) orbitalfunc(src int) func() {
 			//queue up next instance
 			c.AddTask(c.orbitalfunc(src), "xq-skill-orbital", 135)
 
-			return &d
+			return d
 		}, 1)
 	}
 }
@@ -187,7 +187,7 @@ func (c *char) Skill(p map[string]int) (int, int) {
 				d.Mult = d.Mult * 1.5
 			}
 		}
-		return &d
+		return d
 	}
 
 	c.QueueDmgDynamic(func() *core.Snapshot { return skillCreateSnapshot(0) }, 19)

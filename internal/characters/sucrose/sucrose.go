@@ -203,7 +203,7 @@ func (c *char) Attack(p map[string]int) (int, int) {
 		attack[c.NormalCounter][c.TalentLvlAttack()],
 	)
 
-	c.QueueDmg(&d, f-5)
+	c.QueueDmg(d, f-5)
 
 	c.AdvanceNormalIndex()
 
@@ -225,7 +225,7 @@ func (c *char) ChargeAttack(p map[string]int) (int, int) {
 		charge[c.TalentLvlAttack()],
 	)
 
-	c.QueueDmg(&d, f-1)
+	c.QueueDmg(d, f-1)
 
 	c.c4()
 
@@ -278,7 +278,7 @@ func (c *char) Skill(p map[string]int) (int, int) {
 		c.Core.Status.AddStatus("sucrosea4", 480)
 		c.a4EM[core.EM] = 0.2 * c.Stat(core.EM)
 		c.Core.Log.Debugw("sucrose a4 triggered", "frame", c.Core.F, "event", core.LogCharacterEvent, "em snapshot", c.a4EM, "expiry", c.Core.F+480)
-		c.Core.Combat.ApplyDamage(&d)
+		c.Core.Combat.ApplyDamage(d)
 	}, "Sucrose - Skill", 41)
 
 	c.QueueParticle("sucrose", 4, core.Anemo, 150)
@@ -354,14 +354,14 @@ func (c *char) Burst(p map[string]int) (int, int) {
 	d.Targets = core.TargetAll
 
 	for i := 120; i <= duration; i += 120 {
-		x := d.Clone()
+		x := c.Core.Snapshots.Clone(d)
 
 		c.AddTask(func() {
 			c.Core.Status.AddStatus("sucrosea4", 480)
 			c.a4EM[core.EM] = 0.2 * c.Stat(core.EM)
 			c.Core.Log.Debugw("sucrose a4 triggered", "frame", c.Core.F, "event", core.LogCharacterEvent, "em snapshot", c.a4EM, "expiry", c.Core.F+480)
 
-			c.Core.Combat.ApplyDamage(&x)
+			c.Core.Combat.ApplyDamage(x)
 
 			if c.qInfused != core.NoElement {
 				d := c.Snapshot(
@@ -375,7 +375,7 @@ func (c *char) Burst(p map[string]int) (int, int) {
 					burstAbsorb[c.TalentLvlBurst()],
 				)
 				d.Targets = core.TargetAll
-				c.Core.Combat.ApplyDamage(&d)
+				c.Core.Combat.ApplyDamage(d)
 			}
 			//check if infused
 		}, "sucrose-burst-em", i)

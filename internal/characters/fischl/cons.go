@@ -21,7 +21,7 @@ func (c *char) c6() {
 			0.3,
 		)
 		d.Targets = 0
-		c.QueueDmg(&d, 1)
+		c.QueueDmg(d, 1)
 		return false
 	}, "fischl-c6")
 }

@@ -54,7 +54,7 @@ func weapon(char core.Character, c *core.Core, r int, param map[string]int) {
 			1.25,
 		)
 		d.Targets = core.TargetAll
-		char.QueueDmg(&d, 1)
+		char.QueueDmg(d, 1)
 
 		//trigger cd
 		icd = c.F + cd

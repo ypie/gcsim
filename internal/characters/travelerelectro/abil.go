@@ -20,7 +20,7 @@ func (c *char) Attack(p map[string]int) (int, int) {
 		attack[c.NormalCounter][c.TalentLvlAttack()],
 	)
 
-	c.QueueDmg(&d, f-1)
+	c.QueueDmg(d, f-1)
 
 	c.AdvanceNormalIndex()
 
@@ -49,8 +49,8 @@ func (c *char) Skill(p map[string]int) (int, int) {
 	c.QueueParticle("travelerelectro", 1, core.Cryo, f+100)
 
 	for i := 0; i < hits; i++ {
-		x := d.Clone()
-		c.QueueDmg(&x, f)
+		x := c.Core.Snapshots.Clone(d)
+		c.QueueDmg(x, f)
 	}
 
 	c.SetCD(core.ActionSkill, 810+21) //13.5s, starts 21 frames in
@@ -70,7 +70,7 @@ func (c *char) Burst(p map[string]int) (int, int) {
 		burst[c.TalentLvlBurst()],
 	)
 
-	c.QueueDmg(&d, f)
+	c.QueueDmg(d, f)
 
 	//1573 start, 1610 cd starts, 1612 energy drained, 1633 first swapable
 	c.ConsumeEnergy(39)

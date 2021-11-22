@@ -128,7 +128,7 @@ func (c *char) c1(delay int) {
 		1.2*burst[c.TalentLvlBurst()],
 	)
 	//trigger dmg
-	c.QueueDmg(&d, delay)
+	c.QueueDmg(d, delay)
 }
 
 func (c *char) Attack(p map[string]int) (int, int) {
@@ -151,7 +151,7 @@ func (c *char) Attack(p map[string]int) (int, int) {
 	)
 
 	c.AddTask(func() {
-		c.Core.Combat.ApplyDamage(&d)
+		c.Core.Combat.ApplyDamage(d)
 		c.addSpark()
 	}, "klee normal", f+travel)
 
@@ -200,7 +200,7 @@ func (c *char) ChargeAttack(p map[string]int) (int, int) {
 		d.Stats[core.DmgP] += 0.5
 	}
 
-	c.QueueDmg(&d, f+travel)
+	c.QueueDmg(d, f+travel)
 
 	c.c1(f + travel)
 
@@ -230,9 +230,9 @@ func (c *char) Skill(p map[string]int) (int, int) {
 	)
 
 	for i := 0; i < bounce; i++ {
-		x := d.Clone()
+		x := c.Core.Snapshots.Clone(d)
 		c.AddTask(func() {
-			c.Core.Combat.ApplyDamage(&x)
+			c.Core.Combat.ApplyDamage(x)
 			c.addSpark()
 		}, "klee bomb", f+30+i*40)
 	}
@@ -265,9 +265,9 @@ func (c *char) Skill(p map[string]int) (int, int) {
 
 	//roughly 160 frames after mines are laid
 	for i := 0; i < minehits; i++ {
-		x := d.Clone()
+		x := c.Core.Snapshots.Clone(d)
 		c.AddTask(func() {
-			c.Core.Combat.ApplyDamage(&x)
+			c.Core.Combat.ApplyDamage(x)
 			c.addSpark()
 		}, "klee mine", f+160)
 
@@ -332,53 +332,57 @@ func (c *char) Burst(p map[string]int) (int, int) {
 
 	for i := 132; i < 732; i += 108 {
 		//wave 1 = 1
-		x := d.Clone()
+		x := c.Core.Snapshots.Clone(d)
 		c.AddTask(func() {
 			//no more if klee is not on field
 			if c.Core.ActiveChar != c.Index {
 				return
 			}
-			c.Core.Combat.ApplyDamage(&x)
+			c.Core.Combat.ApplyDamage(x)
 		}, "klee-burst", i)
 		//wave 2 = 1 + 30% chance of 1
-		x = d.Clone()
+		// x = d.Clone()
+		x1 := c.Core.Snapshots.Clone(d)
 		c.AddTask(func() {
 			//no more if klee is not on field
 			if c.Core.ActiveChar != c.Index {
 				return
 			}
-			c.Core.Combat.ApplyDamage(&x)
+			c.Core.Combat.ApplyDamage(x1)
 		}, "klee-burst", i+12)
 		if c.Core.Rand.Float64() < 0.3 {
-			x = d.Clone()
+			x2 := c.Core.Snapshots.Clone(d)
 			c.AddTask(func() {
 				//no more if klee is not on field
 				if c.Core.ActiveChar != c.Index {
 					return
 				}
-				c.Core.Combat.ApplyDamage(&x)
+				c.Core.Combat.ApplyDamage(x2)
 			}, "klee-burst", i+12)
 		}
 		//wave 3 = 1 + 50% chance of 1
-		x = d.Clone()
+		x3 := c.Core.Snapshots.Clone(d)
 		c.AddTask(func() {
 			//no more if klee is not on field
 			if c.Core.ActiveChar != c.Index {
 				return
 			}
-			c.Core.Combat.ApplyDamage(&x)
+			c.Core.Combat.ApplyDamage(x3)
 		}, "klee-burst", i+24)
 		if c.Core.Rand.Float64() < 0.5 {
-			x = d.Clone()
+			x4 := c.Core.Snapshots.Clone(d)
 			c.AddTask(func() {
 				//no more if klee is not on field
 				if c.Core.ActiveChar != c.Index {
 					return
 				}
-				c.Core.Combat.ApplyDamage(&x)
+				c.Core.Combat.ApplyDamage(x4)
 			}, "klee-burst", i+24)
 		}
 	}
+
+	c.Core.Snapshots.Release(d)
+	d = nil
 
 	c.AddTask(func() {
 		c.Core.Status.AddStatus("kleeq", 600)
@@ -439,7 +443,7 @@ func (c *char) c4() {
 				50,
 				5.55,
 			)
-			c.Core.Combat.ApplyDamage(&d)
+			c.Core.Combat.ApplyDamage(d)
 		}
 		return false
 

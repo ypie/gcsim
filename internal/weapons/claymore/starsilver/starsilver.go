@@ -46,7 +46,7 @@ func weapon(char core.Character, c *core.Core, r int, param map[string]int) {
 			if t.AuraType() == core.Cryo || t.AuraType() == core.Frozen {
 				d.Mult = atkc
 			}
-			char.QueueDmg(&d, 1)
+			char.QueueDmg(d, 1)
 
 		}
 		return false

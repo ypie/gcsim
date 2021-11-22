@@ -21,8 +21,8 @@ func (c *char) Attack(p map[string]int) (int, int) {
 	d.FlatDmg = 0.0139 * c.HPMax
 
 	for i := 0; i < hits[c.NormalCounter]; i++ {
-		x := d.Clone()
-		c.QueueDmg(&x, f-i)
+		x := c.Core.Snapshots.Clone(d)
+		c.QueueDmg(x, f-i)
 	}
 
 	c.AdvanceNormalIndex()
@@ -43,7 +43,7 @@ func (c *char) ChargeAttack(p map[string]int) (int, int) {
 	)
 	d.FlatDmg = 0.0139 * c.HPMax
 
-	c.QueueDmg(&d, f-1)
+	c.QueueDmg(d, f-1)
 
 	return f, a
 }
@@ -93,7 +93,7 @@ func (c *char) skillHold(f, max int, createSteele bool) {
 	d.FlatDmg = 0.019 * c.HPMax
 	d.Targets = core.TargetAll
 
-	c.QueueDmg(&d, f-1)
+	c.QueueDmg(d, f-1)
 
 	//create a steele if none exists and desired by player
 	if (c.steeleCount == 0) && createSteele {
@@ -121,7 +121,7 @@ func (c *char) Burst(p map[string]int) (int, int) {
 	d.Targets = core.TargetAll
 	d.FlatDmg = 0.33 * c.HPMax
 
-	c.QueueDmg(&d, f-1)
+	c.QueueDmg(d, f-1)
 
 	if c.Base.Cons >= 2 {
 		c.addJadeShield()

@@ -14,7 +14,7 @@ func init() {
 type char struct {
 	*character.Tmpl
 	//field use for calculating oz damage
-	ozSnapshot core.Snapshot
+	ozSnapshot *core.Snapshot
 
 	ozSource      int //keep tracks of source of oz aka resets
 	ozActiveUntil int
@@ -85,7 +85,7 @@ func (c *char) Attack(p map[string]int) (int, int) {
 		25,
 		auto[c.NormalCounter][c.TalentLvlAttack()],
 	)
-	c.QueueDmg(&d, travel+f)
+	c.QueueDmg(d, travel+f)
 	c.AdvanceNormalIndex()
 
 	//check for c1
@@ -100,7 +100,7 @@ func (c *char) Attack(p map[string]int) (int, int) {
 			100,
 			0.22,
 		)
-		c.QueueDmg(&d, travel+f+1)
+		c.QueueDmg(d, travel+f+1)
 	}
 
 	return f, a
@@ -140,8 +140,9 @@ func (c *char) ozTick(src int) func() {
 		}
 		c.Core.Log.Debugw("Oz ticked", "frame", c.Core.F, "event", core.LogCharacterEvent, "next expected tick", c.Core.F+60, "active", c.ozActiveUntil, "src", src)
 		//trigger damage
-		d := c.ozSnapshot.Clone()
-		c.Core.Combat.ApplyDamage(&d)
+		// d := c.ozSnapshot.Clone()
+		d := c.Core.Snapshots.Clone(c.ozSnapshot)
+		c.Core.Combat.ApplyDamage(d)
 		//check for orb
 		//Particle check is 67% for particle, from datamine
 		if c.Core.Rand.Float64() < .67 {
@@ -173,7 +174,7 @@ func (c *char) Skill(p map[string]int) (int, int) {
 	if c.Base.Cons >= 2 {
 		d.Mult += 2
 	}
-	c.QueueDmg(&d, 1) //queue initial damage
+	c.QueueDmg(d, 1) //queue initial damage
 
 	//set on field oz to be this one
 	c.AddTask(func() {
@@ -205,7 +206,7 @@ func (c *char) Burst(p map[string]int) (int, int) {
 		burst[c.TalentLvlBurst()],
 	)
 	d.Targets = core.TargetAll
-	c.QueueDmg(&d, 1)
+	c.QueueDmg(d, 1)
 
 	//check for C4 damage
 	if c.Base.Cons >= 4 {
@@ -219,7 +220,7 @@ func (c *char) Burst(p map[string]int) (int, int) {
 			50,
 			2.22,
 		)
-		c.QueueDmg(&d, 1)
+		c.QueueDmg(d, 1)
 		//heal at end of animation
 		heal := c.MaxHP() * 0.2
 		c.AddTask(func() {

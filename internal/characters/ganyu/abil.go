@@ -24,7 +24,7 @@ func (c *char) Attack(p map[string]int) (int, int) {
 		attack[c.NormalCounter][c.TalentLvlAttack()],
 	)
 
-	c.QueueDmg(&d, travel+f)
+	c.QueueDmg(d, travel+f)
 
 	c.AdvanceNormalIndex()
 
@@ -69,8 +69,8 @@ func (c *char) Aimed(p map[string]int) (int, int) {
 		)
 		d2.Targets = core.TargetAll
 
-		c.QueueDmg(&d, travel)
-		c.QueueDmg(&d2, travel+bloom)
+		c.QueueDmg(d, travel)
+		c.QueueDmg(d2, travel+bloom)
 
 	}, "ganyu-aim-snap", f)
 
@@ -101,18 +101,19 @@ func (c *char) Skill(p map[string]int) (int, int) {
 	d.Targets = core.TargetAll
 
 	//snap shot stats at cast time here
-	explode := d.Clone()
+	// explode := d.Clone()
+	explode := c.Core.Snapshots.Clone(d)
 
 	//we get the orbs right away
 	c.QueueParticle("ganyu", 2, core.Cryo, 90)
 	//flower damage immediately
 	c.AddTask(func() {
-		c.Core.Combat.ApplyDamage(&d)
+		c.Core.Combat.ApplyDamage(d)
 	}, "Ice Lotus", 30)
 
 	//flower damage is after 6 seconds
 	c.AddTask(func() {
-		c.Core.Combat.ApplyDamage(&explode)
+		c.Core.Combat.ApplyDamage(explode)
 	}, "Ice Lotus", 360)
 
 	c.QueueParticle("ganyu", 2, core.Cryo, 360)
@@ -197,13 +198,16 @@ func (c *char) Burst(p map[string]int) (int, int) {
 				return
 			}
 			//deal dmg
-			x := d.Clone()
+			x := c.Core.Snapshots.Clone(d)
 			x.Targets = core.TargetAll //eventually change this to target index and use hitbox
 			// ccc++
-			c.Core.Combat.ApplyDamage(&x)
+			c.Core.Combat.ApplyDamage(x)
 		}, "ganyu-q", delay+f)
 
 	}
+
+	c.Core.Snapshots.Release(d)
+	d = nil
 	// c.AddTask(func() {
 	// 	log.Println(ccc, prob)
 	// }, "counts", 900+f+10)

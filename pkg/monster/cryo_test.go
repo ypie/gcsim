@@ -49,7 +49,7 @@ func TestCryoAura(t *testing.T) {
 
 	fmt.Println("----cryo testing----")
 
-	c.Combat.ApplyDamage(&core.Snapshot{
+	c.Combat.ApplyDamage(core.Snapshot{
 		Durability: 25,
 		Element:    core.Cryo,
 		ICDTag:     core.ICDTagNone,
@@ -74,7 +74,7 @@ func TestCryoAura(t *testing.T) {
 	}
 
 	//TEST REFRESH
-	c.Combat.ApplyDamage(&core.Snapshot{
+	c.Combat.ApplyDamage(core.Snapshot{
 		Durability: 50,
 		Element:    core.Cryo,
 		ICDTag:     core.ICDTagNone,

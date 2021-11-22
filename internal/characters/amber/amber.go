@@ -98,13 +98,15 @@ func (c *char) Attack(p map[string]int) (int, int) {
 		attack[c.NormalCounter][c.TalentLvlAttack()],
 	)
 
-	c.QueueDmg(&d, travel+f)
+	c.QueueDmg(d, travel+f)
 
 	if c.Base.Cons >= 1 {
-		x := d.Clone()
+		x := c.Core.Snapshots.Clone(d)
 		x.Mult = .2 * d.Mult
-		c.QueueDmg(&x, travel+f)
+		c.QueueDmg(x, travel+f)
 	}
+	c.Core.Snapshots.Release(d)
+	d = nil
 
 	c.AdvanceNormalIndex()
 
@@ -160,7 +162,7 @@ func (c *char) Aimed(p map[string]int) (int, int) {
 		})
 	}, "aim", f+travel)
 
-	c.QueueDmg(&d, travel+f)
+	c.QueueDmg(d, travel+f)
 
 	return f, a
 }
@@ -216,7 +218,7 @@ func (c *char) recoverCharge(src int) func() {
 }
 
 type bunny struct {
-	ds  core.Snapshot
+	ds  *core.Snapshot
 	src int
 }
 
@@ -250,7 +252,7 @@ func (c *char) explode(src int) {
 	for _, v := range c.bunnies {
 		if v.src == src {
 
-			c.QueueDmg(&v.ds, 1)
+			c.QueueDmg(v.ds, 1)
 			//4 orbs
 			c.QueueParticle("amber", 4, core.Pyro, 100)
 		} else {
@@ -266,7 +268,7 @@ func (c *char) manualExplode() {
 	if len(c.bunnies) > 0 {
 		ds := c.bunnies[0].ds
 		ds.Mult = ds.Mult + 2
-		c.QueueDmg(&ds, 1)
+		c.QueueDmg(ds, 1)
 		c.QueueParticle("amber", 4, core.Pyro, 100)
 	}
 	c.bunnies = c.bunnies[1:]
@@ -291,7 +293,7 @@ func (c *char) overloadExplode() {
 			for _, v := range c.bunnies {
 				ds := v.ds
 				ds.Mult = ds.Mult + 2
-				c.QueueDmg(&ds, 1)
+				c.QueueDmg(ds, 1)
 				c.QueueParticle("amber", 4, core.Pyro, 100)
 			}
 			c.bunnies = make([]bunny, 0, 2)
@@ -321,19 +323,21 @@ func (c *char) Burst(p map[string]int) (int, int) {
 	d.Stats[core.CR] += 0.1 // a2
 
 	for i := f + 24; i < 120+f; i += 24 {
-		x := d.Clone()
-		c.QueueDmg(&x, i)
+		x := c.Core.Snapshots.Clone(d)
+		c.QueueDmg(x, i)
 	}
 
 	for i := f + 36; i < 120+f; i += 36 {
-		x := d.Clone()
-		c.QueueDmg(&x, i)
+		x := c.Core.Snapshots.Clone(d)
+		c.QueueDmg(x, i)
 	}
 
 	for i := f + 12; i < 120+f; i += 12 {
-		x := d.Clone()
-		c.QueueDmg(&x, i)
+		x := c.Core.Snapshots.Clone(d)
+		c.QueueDmg(x, i)
 	}
+	c.Core.Snapshots.Release(d)
+	d = nil
 
 	if c.Base.Cons == 6 {
 		for _, active := range c.Core.Chars {

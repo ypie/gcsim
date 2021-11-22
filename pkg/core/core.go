@@ -74,6 +74,7 @@ type Core struct {
 	Shields    ShieldHandler
 	Health     HealthHandler
 	Events     EventHandler
+	Snapshots  SnapshotHandler
 }
 
 func New(cfg ...func(*Core) error) (*Core, error) {
@@ -133,6 +134,9 @@ func New(cfg ...func(*Core) error) (*Core, error) {
 	}
 	if c.Events == nil {
 		c.Events = NewEventCtrl(c)
+	}
+	if c.Snapshots == nil {
+		c.Snapshots = NewMemCtrl(100)
 	}
 
 	//check handlers

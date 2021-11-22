@@ -110,9 +110,9 @@ func (c *char) Attack(p map[string]int) (int, int) {
 	)
 
 	for i, mult := range attack[c.NormalCounter] {
-		x := d.Clone()
+		x := c.Core.Snapshots.Clone(d)
 		x.Mult = mult[c.TalentLvlAttack()]
-		c.QueueDmg(&x, f-i)
+		c.QueueDmg(x, f-i)
 	}
 
 	//if n = 5, add explosion for c2
@@ -130,7 +130,7 @@ func (c *char) Attack(p map[string]int) (int, int) {
 				25,
 				0.75,
 			)
-			return &d1
+			return d1
 		}, 120)
 	}
 	//add a 75 frame attackcounter reset
@@ -153,7 +153,7 @@ func (c *char) ChargeAttack(p map[string]int) (int, int) {
 		nc[c.TalentLvlAttack()],
 	)
 
-	c.QueueDmg(&d, f-1)
+	c.QueueDmg(d, f-1)
 
 	//return animation cd
 	return f, a
@@ -190,8 +190,8 @@ func (c *char) Skill(p map[string]int) (int, int) {
 
 	//lasts 73 seconds, shoots every 1.6 seconds
 	for i := 0; i < 4; i++ {
-		x := d.Clone()
-		c.QueueDmg(&x, delay+i*90)
+		x := c.Core.Snapshots.Clone(d)
+		c.QueueDmg(x, delay+i*90)
 		c.QueueParticle("xiangling", 1, core.Pyro, delay+i*95+90+60)
 	}
 
@@ -218,10 +218,10 @@ func (c *char) Burst(p map[string]int) (int, int) {
 				25,
 				pyronadoInitial[j][lvl],
 			)
-			c.Core.Combat.ApplyDamage(&x)
+			c.Core.Combat.ApplyDamage(x)
 		}, "pyronado initial", delay[i])
 
-		// c.QueueDmg(&x, delay[i])
+		// c.QueueDmg(x, delay[i])
 	}
 
 	//ok for now we assume it's 80 (or 70??) frames per cycle, that gives us roughly 10s uptime
@@ -231,11 +231,11 @@ func (c *char) Burst(p map[string]int) (int, int) {
 		max = 14 * 60
 	}
 
-	var d core.Snapshot
+	// var d *core.Snapshot
 
 	c.AddTask(func() {
 		//spin to win; snapshot between 2nd and 3rd hit
-		d = c.Snapshot(
+		d := c.Snapshot(
 			"Pyronado",
 			core.AttackTagElementalBurst,
 			core.ICDTagNone,
@@ -246,13 +246,17 @@ func (c *char) Burst(p map[string]int) (int, int) {
 			pyronadoSpin[lvl],
 		)
 		d.Targets = core.TargetAll
+
+		for delay := 0; delay <= max-70; delay += 70 {
+			x := c.Core.Snapshots.Clone(d)
+			c.QueueDmg(x, delay+1)
+		}
+
+		c.Core.Snapshots.Release(d)
+		d = nil
 	}, "pyronado-snap", 69)
 
 	c.Core.Status.AddStatus("xianglingburst", max)
-
-	for delay := 70; delay <= max; delay += 70 {
-		c.QueueDmg(&d, delay)
-	}
 
 	//add an effect starting at frame 70 to end of duration to increase pyro dmg by 15% if c6
 	if c.Base.Cons >= 6 {

@@ -27,7 +27,7 @@ func weapon(char core.Character, c *core.Core, r int, param map[string]int) {
 	//add on crit effect
 	c.Events.Subscribe(core.OnDamage, func(args ...interface{}) bool {
 		ds := args[1].(*core.Snapshot)
-		if ds.Actor != char.Name() {
+		if ds.ActorIndex != char.CharIndex() {
 			return false
 		}
 		if ds.AttackTag != core.AttackTagElementalArt {

@@ -128,7 +128,7 @@ func (c *char) Attack(p map[string]int) (int, int) {
 	)
 	d.Targets = core.TargetAll
 	c.AddTask(func() {
-		c.Core.Combat.ApplyDamage(&d)
+		c.Core.Combat.ApplyDamage(d)
 		//check for healing
 		if c.Core.Shields.Get(core.ShieldNoelleSkill) != nil {
 			prob := healChance[c.TalentLvlSkill()]
@@ -226,7 +226,7 @@ func (c *char) Skill(p map[string]int) (int, int) {
 
 	c.a4Counter = 0
 
-	c.QueueDmg(&d, f+1)
+	c.QueueDmg(d, f+1)
 
 	if c.Base.Cons >= 4 {
 		c.AddTask(func() {
@@ -254,7 +254,7 @@ func (c *char) explodeShield() {
 		4,
 	)
 	d.Targets = core.TargetAll
-	c.QueueDmg(&d, 1)
+	c.QueueDmg(d, 1)
 }
 
 func (c *char) Burst(p map[string]int) (int, int) {
@@ -274,7 +274,7 @@ func (c *char) Burst(p map[string]int) (int, int) {
 	)
 	d.Targets = core.TargetAll
 
-	c.QueueDmg(&d, f-10)
+	c.QueueDmg(d, f-10)
 
 	d = c.Snapshot(
 		"Sweeping Time (Skill)",
@@ -288,14 +288,14 @@ func (c *char) Burst(p map[string]int) (int, int) {
 	)
 	d.Targets = core.TargetAll
 
-	c.QueueDmg(&d, f-5)
+	c.QueueDmg(d, f-5)
 
 	c.SetCD(core.ActionBurst, 900)
 	c.Energy = 0
 	return f, a
 }
 
-func (c *char) Snapshot(name string, a core.AttackTag, icd core.ICDTag, g core.ICDGroup, st core.StrikeType, e core.EleType, d core.Durability, mult float64) core.Snapshot {
+func (c *char) Snapshot(name string, a core.AttackTag, icd core.ICDTag, g core.ICDGroup, st core.StrikeType, e core.EleType, d core.Durability, mult float64) *core.Snapshot {
 	ds := c.Tmpl.Snapshot(name, a, icd, g, st, e, d, mult)
 
 	if c.Core.Status.Duration("noelleq") > 0 {

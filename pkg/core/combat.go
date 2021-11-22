@@ -1,5 +1,7 @@
 package core
 
+import "log"
+
 type CombatHandler interface {
 	ApplyDamage(ds *Snapshot) float64
 	TargetHasResMod(debuff string, param int) bool
@@ -21,8 +23,12 @@ func (c *CombatCtrl) ApplyDamage(ds *Snapshot) float64 {
 	died := false
 	var total float64
 	for i, t := range c.core.Targets {
-		d := ds.Clone()
-		dmg, crit := t.Attack(&d)
+		// d := ds.Clone()
+		if ds == nil {
+			log.Println("apply dmg called with nil snapshot?")
+		}
+		d := c.core.Snapshots.Clone(ds)
+		dmg, crit := t.Attack(d)
 		total += dmg
 
 		//check if target is dead
@@ -52,6 +58,8 @@ func (c *CombatCtrl) ApplyDamage(ds *Snapshot) float64 {
 			"source", d.SourceFrame,
 		)
 
+		//release snapshot here; shouldn't be used anymore
+		c.core.Snapshots.Release(d)
 	}
 	if died {
 		//wipe out nil entries

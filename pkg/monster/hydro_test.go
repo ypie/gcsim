@@ -49,7 +49,7 @@ func TestHydroAura(t *testing.T) {
 
 	fmt.Println("----hydro testing----")
 
-	c.Combat.ApplyDamage(&core.Snapshot{
+	c.Combat.ApplyDamage(core.Snapshot{
 		Durability: 25,
 		Element:    core.Hydro,
 		ICDTag:     core.ICDTagNone,
@@ -75,7 +75,7 @@ func TestHydroAura(t *testing.T) {
 	}
 
 	//TEST REFRESH
-	c.Combat.ApplyDamage(&core.Snapshot{
+	c.Combat.ApplyDamage(core.Snapshot{
 		Durability: 50,
 		Element:    core.Hydro,
 		ICDTag:     core.ICDTagNone,

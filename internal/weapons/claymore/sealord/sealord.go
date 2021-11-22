@@ -54,7 +54,7 @@ func weapon(char core.Character, c *core.Core, r int, param map[string]int) {
 			tunaDmg,
 		)
 		d.Targets = core.TargetAll
-		char.QueueDmg(&d, 1)
+		char.QueueDmg(d, 1)
 
 		return false
 	}, fmt.Sprintf("sealord-%v", char.Name()))

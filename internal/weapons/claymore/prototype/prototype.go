@@ -40,7 +40,7 @@ func weapon(char core.Character, c *core.Core, r int, param map[string]int) {
 				atk,
 			)
 			d.Targets = core.TargetAll
-			char.QueueDmg(&d, 1)
+			char.QueueDmg(d, 1)
 		}
 		return false
 	}, fmt.Sprintf("forstbearer-%v", char.Name()))

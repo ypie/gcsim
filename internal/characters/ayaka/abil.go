@@ -21,7 +21,7 @@ func (c *char) Attack(p map[string]int) (int, int) {
 			25,
 			mult[c.TalentLvlAttack()],
 		)
-		c.QueueDmg(&d, f-5+i)
+		c.QueueDmg(d, f-5+i)
 	}
 
 	c.AdvanceNormalIndex()
@@ -46,9 +46,11 @@ func (c *char) ChargeAttack(p map[string]int) (int, int) {
 	d.Targets = core.TargetAll
 
 	for i := 0; i < 3; i++ {
-		x := d.Clone()
-		c.QueueDmg(&x, f-3+i)
+		x := c.Core.Snapshots.Clone(d)
+		c.QueueDmg(x, f-3+i)
 	}
+	c.Core.Snapshots.Release(d)
+	d = nil
 
 	return f, a
 }
@@ -69,7 +71,7 @@ func (c *char) Dash(p map[string]int) (int, int) {
 		25,
 		0,
 	)
-	c.QueueDmg(&d, f)
+	c.QueueDmg(d, f)
 	//since we always hit, just restore the stam and add bonus...
 	c.AddTask(func() {
 		c.Core.RestoreStam(10)
@@ -126,7 +128,7 @@ func (c *char) Skill(p map[string]int) (int, int) {
 		},
 	})
 
-	c.QueueDmg(&d, f)
+	c.QueueDmg(d, f)
 
 	c.SetCD(core.ActionSkill, 600)
 	return f, a
@@ -161,11 +163,13 @@ func (c *char) Burst(p map[string]int) (int, int) {
 	db.Targets = core.TargetAll
 
 	//5 second, 20 ticks, so once every 15 frames, bloom after 5 seconds
-	c.QueueDmg(&db, f+300)
+	c.QueueDmg(db, f+300)
 	for i := 0; i < 300; i += 15 {
-		x := d.Clone()
-		c.QueueDmg(&x, f+i)
+		x := c.Core.Snapshots.Clone(d)
+		c.QueueDmg(x, f+i)
 	}
+	c.Core.Snapshots.Release(d)
+	d = nil
 
 	c.SetCD(core.ActionBurst, 20*60)
 	c.Energy = 0

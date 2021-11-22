@@ -110,7 +110,7 @@ func (c *char) Attack(p map[string]int) (int, int) {
 		attack[c.NormalCounter][c.TalentLvlAttack()],
 	)
 	d.Targets = core.TargetAll
-	c.QueueDmg(&d, f-1)
+	c.QueueDmg(d, f-1)
 	if c.NormalCounter == 3 && c.Base.Cons >= 1 {
 		d := c.Snapshot(
 			"Chongyun C1",
@@ -124,9 +124,11 @@ func (c *char) Attack(p map[string]int) (int, int) {
 		)
 		//3 blades
 		for i := 0; i < 3; i++ {
-			x := d.Clone()
-			c.QueueDmg(&x, f+i*5) //TODO: frames
+			x := c.Core.Snapshots.Clone(d)
+			c.QueueDmg(x, f+i*5) //TODO: frames
 		}
+		c.Core.Snapshots.Release(d)
+		d = nil
 	}
 	c.AdvanceNormalIndex()
 
@@ -147,7 +149,7 @@ func (c *char) Skill(p map[string]int) (int, int) {
 		skill[c.TalentLvlSkill()],
 	)
 	d.Targets = core.TargetAll
-	c.QueueDmg(&d, f-1)
+	c.QueueDmg(d, f-1)
 
 	//TODO: energy count; lib says 3:4?
 	c.QueueParticle("Chongyun", 4, core.Cryo, 100)
@@ -167,7 +169,7 @@ func (c *char) Skill(p map[string]int) (int, int) {
 		)
 		d.Targets = core.TargetAll
 
-		c.Core.Combat.ApplyDamage(&d)
+		c.Core.Combat.ApplyDamage(d)
 		//add res mod after dmg
 		d.OnHitCallback = func(t core.Target) {
 			t.AddResMod("Chongyun A4", core.ResistMod{
@@ -269,9 +271,12 @@ func (c *char) Burst(p map[string]int) (int, int) {
 	}
 
 	for i := 0; i < count; i++ {
-		x := d.Clone()
-		c.QueueDmg(&x, f+10*i)
+		x := c.Core.Snapshots.Clone(d)
+		c.QueueDmg(x, f+10*i)
 	}
+
+	c.Core.Snapshots.Release(d)
+	d = nil
 
 	c.SetCD(core.ActionBurst, 720)
 	c.Energy = 0

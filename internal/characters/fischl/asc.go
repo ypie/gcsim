@@ -40,7 +40,7 @@ func (c *char) a4() {
 			0.8,
 		)
 		d.Targets = t.Index()
-		c.QueueDmg(&d, 1)
+		c.QueueDmg(d, 1)
 
 		return false
 	}, "fischl-a4")

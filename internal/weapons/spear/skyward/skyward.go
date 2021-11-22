@@ -56,7 +56,7 @@ func weapon(char core.Character, c *core.Core, r int, param map[string]int) {
 			100,
 			atk,
 		)
-		char.QueueDmg(&d, 1)
+		char.QueueDmg(d, 1)
 
 		//trigger cd
 		icd = c.F + 120

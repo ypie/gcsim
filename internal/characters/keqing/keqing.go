@@ -134,9 +134,9 @@ func (c *char) Attack(p map[string]int) (int, int) {
 	)
 
 	for i, mult := range attack[c.NormalCounter] {
-		x := d.Clone()
+		x := c.Core.Snapshots.Clone(d)
 		x.Mult = mult[c.TalentLvlAttack()]
-		c.QueueDmg(&x, delay[c.NormalCounter][i])
+		c.QueueDmg(x, delay[c.NormalCounter][i])
 	}
 
 	if c.Base.Cons == 6 {
@@ -164,10 +164,10 @@ func (c *char) ChargeAttack(p map[string]int) (int, int) {
 	d.Targets = core.TargetAll
 
 	for i, mult := range charge {
-		x := d.Clone()
+		x := c.Core.Snapshots.Clone(d)
 		x.Mult = mult[c.TalentLvlAttack()]
 		x.Abil = fmt.Sprintf("Charge %v", i)
-		c.QueueDmg(&x, f-i*10-5)
+		c.QueueDmg(x, f-i*10-5)
 	}
 
 	if c.Tags["e"] == 1 {
@@ -184,7 +184,7 @@ func (c *char) ChargeAttack(p map[string]int) (int, int) {
 				skillCA[c.TalentLvlSkill()],
 			)
 			d.Targets = core.TargetAll
-			c.QueueDmg(&d, f)
+			c.QueueDmg(d, f)
 		}
 
 		//place on cooldown
@@ -240,7 +240,7 @@ func (c *char) skillFirst(p map[string]int) (int, int) {
 		skill[c.TalentLvlSkill()],
 	)
 
-	c.QueueDmg(&d, f)
+	c.QueueDmg(d, f)
 
 	c.Tags["e"] = 1
 	c.eStartFrame = c.Core.F
@@ -277,7 +277,7 @@ func (c *char) skillNext(p map[string]int) (int, int) {
 	)
 	d.Targets = core.TargetAll
 
-	c.QueueDmg(&d, f)
+	c.QueueDmg(d, f)
 
 	//add electro infusion
 
@@ -307,8 +307,8 @@ func (c *char) skillNext(p map[string]int) (int, int) {
 			0.5,
 		)
 		for i := 0; i < hits; i++ {
-			x := d.Clone()
-			c.QueueDmg(&x, f)
+			x := c.Core.Snapshots.Clone(d)
+			c.QueueDmg(x, f)
 		}
 	}
 
@@ -348,7 +348,7 @@ func (c *char) Burst(p map[string]int) (int, int) {
 	)
 	initial.Targets = core.TargetAll
 
-	c.QueueDmg(&initial, 70)
+	c.QueueDmg(initial, 70)
 
 	//8 hits
 	dot := c.Snapshot(
@@ -363,7 +363,7 @@ func (c *char) Burst(p map[string]int) (int, int) {
 	)
 	dot.Targets = core.TargetAll
 	for i := 70; i < 170; i += 13 {
-		c.QueueDmg(&dot, i)
+		c.QueueDmg(dot, i)
 	}
 
 	//final
@@ -379,7 +379,7 @@ func (c *char) Burst(p map[string]int) (int, int) {
 	)
 	final.Targets = core.TargetAll
 
-	c.QueueDmg(&final, 211)
+	c.QueueDmg(final, 211)
 
 	if c.Base.Cons == 6 {
 		c.activateC6("burst")
