@@ -3,6 +3,7 @@ package ayaka
 import (
 	"github.com/genshinsim/gcsim/pkg/character"
 	"github.com/genshinsim/gcsim/pkg/core"
+	"github.com/genshinsim/gcsim/pkg/core/keys"
 )
 
 type char struct {
@@ -10,8 +11,7 @@ type char struct {
 }
 
 func init() {
-	core.RegisterCharFunc("ayaka", NewChar)
-	core.RegisterCharFunc("kamisatoayaka", NewChar)
+	core.RegisterCharFunc(keys.Ayaka, NewChar)
 }
 
 func NewChar(s *core.Core, p core.CharacterProfile) (core.Character, error) {
@@ -24,6 +24,7 @@ func NewChar(s *core.Core, p core.CharacterProfile) (core.Character, error) {
 	c.Energy = 80
 	c.EnergyMax = 80
 	c.Weapon.Class = core.WeaponClassSword
+	c.CharZone = core.ZoneInazuma
 	c.BurstCon = 3
 	c.SkillCon = 5
 	c.NormalHitNum = 5
@@ -44,7 +45,7 @@ func (c *char) ActionStam(a core.ActionType, p map[string]int) float64 {
 	case core.ActionCharge:
 		return 20
 	default:
-		c.Core.Log.Warnw("ActionStam not implemented", "character", c.Base.Name)
+		c.Core.Log.Warnw("ActionStam not implemented", "character", c.Base.Key.String())
 		return 0
 	}
 }
