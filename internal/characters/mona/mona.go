@@ -28,8 +28,9 @@ func NewChar(s *core.Core, p core.CharacterProfile) (core.Character, error) {
 		return nil, err
 	}
 	c.Tmpl = t
-	c.Energy = 80
-	c.EnergyMax = 80
+	c.Base.Element = core.Hydro
+	c.Energy = 60
+	c.EnergyMax = 60
 	c.Weapon.Class = core.WeaponClassCatalyst
 	c.NormalHitNum = 4
 	c.BurstCon = 3

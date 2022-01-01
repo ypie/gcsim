@@ -27,6 +27,7 @@ func NewChar(s *core.Core, p core.CharacterProfile) (core.Character, error) {
 		return nil, err
 	}
 	c.Tmpl = t
+	c.Base.Element = core.Geo
 	c.Energy = 40
 	c.EnergyMax = 40
 	c.Weapon.Class = core.WeaponClassSword
@@ -183,11 +184,14 @@ func (c *char) Skill(p map[string]int) (int, int) {
 	c.icdSkill = c.Core.F - 1
 
 	//create a construct
-	c.Core.Constructs.New(c.newConstruct(1800), true)
+	// Construct is not fully formed until after the hit lands (exact timing unknown)
+	c.AddTask(func() {
+		c.Core.Constructs.New(c.newConstruct(1800), true)
 
-	c.lastConstruct = c.Core.F
+		c.lastConstruct = c.Core.F
 
-	c.Tags["elevator"] = 1
+		c.Tags["elevator"] = 1
+	}, "albedo-create-construct", f)
 
 	c.SetCD(core.ActionSkill, 240)
 	return f, a

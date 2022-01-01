@@ -21,6 +21,7 @@ func NewChar(s *core.Core, p core.CharacterProfile) (core.Character, error) {
 		return nil, err
 	}
 	c.Tmpl = t
+	c.Base.Element = core.Cryo
 	c.Energy = 80
 	c.EnergyMax = 80
 	c.Weapon.Class = core.WeaponClassBow
@@ -47,7 +48,7 @@ func (c *char) a2() {
 			return -0.1, false
 		}
 		return 0, false
-	})
+	}, "diona")
 }
 
 func (c *char) c2() {

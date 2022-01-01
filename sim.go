@@ -1,6 +1,7 @@
 package gcsim
 
 import (
+	"errors"
 	"fmt"
 	"math/rand"
 	"strings"
@@ -18,7 +19,7 @@ type Simulation struct {
 	cfg  core.Config
 	opts core.RunOpt
 	// queue
-	queue []core.ActionItem
+	queue []core.Command
 	//hurt event
 	lastHurt int
 	//energy event
@@ -191,6 +192,8 @@ func NewSim(cfg core.Config, seed int64, opts core.RunOpt, cust ...func(*Simulat
 		return nil, err
 	}
 
+	s.randomOnHitEnergy()
+
 	for _, f := range cust {
 		err := f(s)
 		if err != nil {
@@ -203,6 +206,59 @@ func NewSim(cfg core.Config, seed int64, opts core.RunOpt, cust ...func(*Simulat
 	// log.Println(s.cfg.Energy)
 
 	return s, nil
+}
+
+func (s *Simulation) randomOnHitEnergy() {
+	/**
+	WeaponClassSword
+	WeaponClassClaymore
+	WeaponClassSpear
+	WeaponClassBow
+	WeaponClassCatalyst
+	**/
+	current := make([]float64, core.EndWeaponClass)
+	inc := []float64{
+		0.05,
+		0.05,
+		0.04,
+		0.01,
+		0.01,
+	}
+
+	//TODO not sure if there's like a 0.2s icd on this. for now let's add it in to be safe
+	icd := 0
+	s.C.Events.Subscribe(core.OnDamage, func(args ...interface{}) bool {
+		atk := args[1].(*core.AttackEvent)
+		if atk.Info.AttackTag != core.AttackTagNormal && atk.Info.AttackTag != core.AttackTagExtra {
+			return false
+		}
+		//check icd
+		if icd > s.C.F {
+			return false
+		}
+		//check chance
+		char := s.C.Chars[atk.Info.ActorIndex]
+		w := char.WeaponClass()
+		if s.C.Rand.Float64() > current[w] {
+			//increment chance
+			current[w] += inc[w]
+			return false
+		}
+		//add energy
+		char.AddEnergy(1)
+		s.C.Log.Debugw("random energy on normal", "frame", s.C.F, "event", core.LogEnergyEvent, "char", atk.Info.ActorIndex, "chance", current[w])
+		//set icd
+		icd = s.C.F + 12
+		current[w] = 0
+		return false
+	}, "random-energy-restore-on-hit")
+	s.C.Events.Subscribe(core.OnCharacterSwap, func(args ...interface{}) bool {
+		//TODO: assuming we clear the probability on swap
+		for i := range current {
+			current[i] = 0
+		}
+		return false
+	}, "random-energy-restore-on-hit-swap")
 }
 
 func (s *Simulation) initTargets(cfg core.Config) error {
@@ -252,7 +308,7 @@ func (s *Simulation) initChars(cfg core.Config) error {
 	s.C.ActiveChar = -1
 	for i, v := range cfg.Characters.Profile {
 		//call new char function
-		err := s.C.AddChar(v)
+		char, err := s.C.AddChar(v)
 		if err != nil {
 			return err
 		}
@@ -267,7 +323,7 @@ func (s *Simulation) initChars(cfg core.Config) error {
 		dup[v.Base.Key] = true
 
 		//track resonance
-		res[v.Base.Element]++
+		res[char.Ele()]++
 
 		//setup maps
 		if s.opts.LogDetails {
@@ -281,26 +337,37 @@ func (s *Simulation) initChars(cfg core.Config) error {
 
 	}
 
+	if s.C.ActiveChar == -1 {
+		return errors.New("no active char set")
+	}
+
 	s.initResonance(res)
 
 	return nil
 }
 
 func (s *Simulation) initQueuer(cfg core.Config) error {
-	cust := make(map[string]int)
+	s.queue = make([]core.Command, 0, 20)
+	// cust := make(map[string]int)
+	// for i, v := range cfg.Rotation {
+	// 	if v.Label != "" {
+	// 		cust[v.Name] = i
+	// 	}
+	// 	// log.Println(v.Conditions)
+	// }
 	for i, v := range cfg.Rotation {
-		if v.Name != "" {
-			cust[v.Name] = i
+		if _, ok := s.C.CharByName(v.SequenceChar); v.Type == core.ActionBlockTypeSequence && !ok {
+			return fmt.Errorf("invalid char in rotation %v; %v", v.SequenceChar, v)
 		}
-		// log.Println(v.Conditions)
+		cfg.Rotation[i].LastQueued = -1
 	}
-	for i, v := range cfg.Rotation {
-		if _, ok := s.C.CharByName(v.Target); !ok {
-			return fmt.Errorf("invalid char in rotation %v", v.Target)
-		}
-		cfg.Rotation[i].Last = -1
-	}
+	s.C.Log.Debugw(
+		"setting queue",
+		"frame", s.C.F,
+		"event", core.LogSimEvent,
+		"pq", cfg.Rotation,
+	)
 
-	s.C.Queue.SetActionList(cfg.Rotation)
-	return nil
+	err := s.C.Queue.SetActionList(cfg.Rotation)
+	return err
 }

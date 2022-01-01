@@ -107,6 +107,10 @@ func Run(src string, opt core.RunOpt, cust ...func(*Simulation) error) (Result, 
 	if err != nil {
 		return Result{}, err
 	}
+	//pretty print
+	// pretty, _ := json.MarshalIndent(cfg.Characters, "", "\t")
+	// log.Println(string(pretty))
+	// log.Println(opt)
 
 	charCount := len(cfg.Characters.Profile)
 

@@ -6,6 +6,7 @@ import (
 	"github.com/genshinsim/gcsim/pkg/character"
 	"github.com/genshinsim/gcsim/pkg/core"
 	"github.com/genshinsim/gcsim/pkg/core/keys"
+	"github.com/genshinsim/gcsim/pkg/player"
 )
 
 func init() {
@@ -27,6 +28,7 @@ func NewChar(s *core.Core, p core.CharacterProfile) (core.Character, error) {
 	c.EnergyMax = 60
 	c.Weapon.Class = core.WeaponClassSword
 	c.NormalHitNum = 5
+	c.Base.Element = core.Pyro
 
 	if c.Base.Cons >= 2 {
 		c.c2()
@@ -266,6 +268,13 @@ func (c *char) applyBennettField(stats [core.EndStatType]float64) func() {
 	atk := pc * float64(c.Base.Atk+c.Weapon.Atk)
 	return func() {
 		c.Core.Log.Debugw("bennett field ticking", "frame", c.Core.F, "event", core.LogCharacterEvent)
+
+		//self infuse
+		player, ok := c.Core.Targets[0].(*player.Player)
+		if !ok {
+			panic("target 0 should be Player but is not!!")
+		}
+		player.ApplySelfInfusion(core.Pyro, 25, 126)
 
 		active := c.Core.Chars[c.Core.ActiveChar]
 		//heal if under 70%

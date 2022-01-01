@@ -9,29 +9,49 @@ import (
 
 func parseTarget(p *Parser) (parseFn, error) {
 	var err error
-	//next should be a string
-	_, err = p.consume(itemString)
-	if err != nil {
-		return nil, err
-	}
 	var r core.EnemyProfile
 	r.Resist = make(map[core.EleType]float64)
 	for n := p.next(); n.typ != itemEOF; n = p.next() {
-		switch {
-		case n.typ == itemLvl:
-			n, err = p.acceptSeqReturnLast(itemAssign, itemNumber)
+		switch n.typ {
+		case itemLvl:
+			n, err = p.acceptSeqReturnLast(itemEqual, itemNumber)
 			if err == nil {
 				r.Level, err = itemNumberToInt(n)
 			}
-		case n.typ == statHP:
-			n, err = p.acceptSeqReturnLast(itemAssign, itemNumber)
+		case itemStatKey:
+			//should be hp
+			if statKeys[n.val] != core.HP {
+				return nil, fmt.Errorf("<target> bad token at line %v - %v: %v", n.line, n.pos, n)
+			}
+			n, err = p.acceptSeqReturnLast(itemEqual, itemNumber)
 			if err == nil {
 				r.HP, err = itemNumberToFloat64(n)
 				p.cfg.DamageMode = true
 			}
-		case n.typ > eleTypeKeyword:
+		case itemResist:
+			//this sets all resistance
+			item, err := p.acceptSeqReturnLast(itemEqual, itemNumber)
+			if err != nil {
+				return nil, err
+			}
+			amt, err := itemNumberToFloat64(item)
+			if err != nil {
+				return nil, err
+			}
+
+			//TODO: make this more elegant...
+			r.Resist[core.Electro] += amt
+			r.Resist[core.Cryo] += amt
+			r.Resist[core.Hydro] += amt
+			r.Resist[core.Physical] += amt
+			r.Resist[core.Pyro] += amt
+			r.Resist[core.Geo] += amt
+			r.Resist[core.Dendro] += amt
+			r.Resist[core.Anemo] += amt
+
+		case itemElementKey:
 			s := n.val
-			item, err := p.acceptSeqReturnLast(itemAssign, itemNumber)
+			item, err := p.acceptSeqReturnLast(itemEqual, itemNumber)
 			if err != nil {
 				return nil, err
 			}
@@ -41,7 +61,7 @@ func parseTarget(p *Parser) (parseFn, error) {
 			}
 
 			r.Resist[eleKeys[s]] += amt
-		case n.typ == itemTerminateLine:
+		case itemTerminateLine:
 			p.cfg.Targets = append(p.cfg.Targets, r)
 			return parseRows, nil
 		default:
